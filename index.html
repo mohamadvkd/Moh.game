@@ -1,0 +1,4773 @@
+<!doctype html>
+<html lang="ar">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover" />
+<title>Crystal Maze: Ultimate Edition</title>
+<style>
+html,body{height:100%;margin:0;background:#05020a;color:#e9f0ff;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;overflow:hidden}
+#game{width:100%;height:100%;display:block;touch-action:none}
+.ui{position:absolute;left:0;right:0;top:8px;display:flex;justify-content:space-between;padding:8px;pointer-events:none;flex-wrap:wrap;gap:5px}
+.panel{pointer-events:auto;background:rgba(255,255,255,0.03);backdrop-filter:blur(6px);padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);flex:1;min-width:120px}
+.title{font-weight:700;font-size:14px;text-shadow:0 0 10px rgba(130,90,220,0.6)}
+.centerHint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;text-align:center}
+.menu{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:auto;background:rgba(10,5,25,0.95);padding:20px;border-radius:15px;border:1px solid rgba(130,90,220,0.3);backdrop-filter:blur(10px);width:90%;max-width:400px;max-height:90vh;overflow-y:auto}
+.menu button{display:block;width:100%;margin:8px 0;padding:12px;font-size:16px;background:linear-gradient(45deg, #6a11cb, #2575fc);color:#fff;border:none;border-radius:8px;cursor:pointer;transition:all 0.3s;}
+.menu button:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(37,117,252,0.4)}
+.menu button:disabled{background:#333;color:#666;cursor:not-allowed;transform:none;box-shadow:none}
+.msgOverlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:1000}
+.msgBox{background:linear-gradient(135deg, #1a1a2e, #16213e);padding:20px;border-radius:15px;text-align:center;border:1px solid rgba(100,80,220,0.4);box-shadow:0 10px 30px rgba(0,0,0,0.5);width:90%;max-width:400px;max-height:90vh;overflow-y:auto}
+.msgBox h2{color:#6a11cb;margin-bottom:20px}
+.msgBox button{margin:5px 0;width:100%}
+.store{max-width:500px;max-height:80vh;overflow-y:auto}
+.skin-item{margin:10px;padding:15px;background:rgba(255,255,255,0.05);border-radius:10px;border:1px solid rgba(255,255,255,0.1)}
+.skin-item.equipped{border-color:#6a11cb;background:rgba(106,17,203,0.2)}
+.skin-preview{width:60px;height:60px;margin:10px auto;border-radius:50%;border:2px solid rgba(255,255,255,0.3)}
+.coin{color:#ffd700;font-weight:bold}
+.particle{position:absolute;pointer-events:none;z-index:100}
+.powerup-indicator{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px;pointer-events:none;flex-wrap:wrap;justify-content:center}
+.powerup-icon{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid transparent;transition:all 0.3s}
+.powerup-icon.active{border-color:#6a11cb;box-shadow:0 0 15px rgba(106,17,203,0.6)}
+.customization-panel{background:rgba(255,255,255,0.05);padding:15px;border-radius:10px;margin:10px 0;border:1px solid rgba(255,255,255,0.1)}
+.customization-option{margin:10px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.customization-option select,.customization-option input{padding:5px 10px;border-radius:5px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);color:white;flex:1}
+.advanced-particle{position:absolute;pointer-events:none;z-index:150}
+.effect-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.close-btn{position:absolute;top:15px;right:15px;background:none;border:none;color:#e9f0ff;font-size:20px;cursor:pointer;padding:5px;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;transition:all 0.3s}
+.close-btn:hover{background:rgba(255,255,255,0.1)}
+.pause-btn{position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.1);border:none;color:#e9f0ff;font-size:24px;cursor:pointer;padding:10px;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2);transition:all 0.3s;z-index:100}
+.pause-btn:hover{background:rgba(255,255,255,0.2);transform:scale(1.1)}
+.fullscreen-btn{position:absolute;top:20px;right:80px;background:rgba(255,255,255,0.1);border:none;color:#e9f0ff;font-size:24px;cursor:pointer;padding:10px;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2);transition:all 0.3s;z-index:100}
+.fullscreen-btn:hover{background:rgba(255,255,255,0.2);transform:scale(1.1)}
+.pause-menu{text-align:center;min-width:280px}
+.pause-menu h2{color:#6a11cb;margin-bottom:30px;font-size:28px}
+.pause-menu button{display:block;width:100%;margin:12px 0;padding:15px;font-size:18px}
+.stages-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));gap:10px;margin:20px 0}
+.stage-btn{padding:15px;background:linear-gradient(45deg, #6a11cb, #2575fc);border:none;border-radius:8px;color:white;cursor:pointer;transition:all 0.3s}
+.stage-btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(37,117,252,0.4)}
+.stage-btn:disabled{background:#333;color:#666;cursor:not-allowed;transform:none;box-shadow:none}
+.reset-btn{background:linear-gradient(45deg, #ff416c, #ff4b2b) !important;margin-top:20px}
+.color-palette{display:grid;grid-template-columns:repeat(5, 1fr);gap:12px;margin:20px 0}
+.color-option{width:45px;height:45px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.color-option:hover{transform:scale(1.15);box-shadow:0 4px 12px rgba(255,255,255,0.2)}
+.color-option.selected{border-color:#fff;box-shadow:0 0 15px rgba(255,255,255,0.8);transform:scale(1.2)}
+.color-mode-option{display:flex;align-items:center;justify-content:space-between;margin:15px 0;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px}
+.color-mode-btn{flex:1;margin:0 5px;padding:10px;border:none;border-radius:5px;cursor:pointer;transition:all 0.3s}
+.color-mode-btn.active{background:linear-gradient(45deg, #6a11cb, #2575fc);color:white}
+
+@media (max-width: 768px) {
+    .ui{flex-direction:column;align-items:center}
+    .panel{width:90%;margin:5px 0}
+    .menu{padding:15px;width:85%}
+    .menu button{padding:10px;font-size:14px}
+    .stages-grid{grid-template-columns:repeat(2, 1fr)}
+    .powerup-indicator{bottom:10px}
+    .powerup-icon{width:35px;height:35px;font-size:16px}
+    .color-palette{grid-template-columns:repeat(4, 1fr);gap:10px}
+    .color-option{width:40px;height:40px}
+    .fullscreen-btn{right:70px;width:45px;height:45px;font-size:20px}
+    .pause-btn{right:20px;width:45px;height:45px;font-size:20px}
+}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div class="effect-layer" id="effectLayer"></div>
+
+<!-- زر التوقف -->
+<button class="pause-btn" id="pauseBtn" style="display:none">⏸️</button>
+
+<!-- زر ملء الشاشة -->
+<button class="fullscreen-btn" id="fullscreenBtn" style="display:none">⛶</button>
+
+<div class="ui">
+  <div class="panel">
+    <div class="title">Crystal Maze: Ultimate</div>
+    <div>شظايا: <span id="score">0</span></div>
+    <div>النقاط: <span id="coins">100</span> <span class="coin">🪙</span></div>
+  </div>
+  <div class="panel" id="stageLabel">المرحلة 1</div>
+  <div class="panel" id="effectsCounter" style="display:none">المؤثرات: <span id="activeEffects">0</span></div>
+</div>
+
+<div class="powerup-indicator" id="powerupIndicator">
+  <!-- سيتم ملؤها بالرموز -->
+</div>
+
+<div class="centerHint"><div id="hint">اسحب في أي اتجاه لتحريك الكرة</div></div>
+
+<!-- القائمة الرئيسية -->
+<div class="menu" id="mainMenu">
+  <h2>القائمة الرئيسية</h2>
+  <button onclick="showStagesMenu()">🎮 المراحل</button>
+  <button onclick="showStore()">🛒 المتجر</button>
+  <button onclick="showSkins()">🎨 السكنات</button>
+  <button onclick="showCustomization()">⚙️ التخصيص</button>
+  <button onclick="showColorsMenu()">🎨 ألوان الكرة</button>
+</div>
+
+<!-- قائمة المراحل -->
+<div class="menu" id="stagesMenu" style="display:none">
+  <button class="close-btn" onclick="hideStagesMenu()">✕</button>
+  <h2>🎮 اختر المرحلة</h2>
+  <div id="stageButtons" class="stages-grid">
+    <!-- سيتم ملؤها بالمراحل -->
+  </div>
+</div>
+
+<!-- قائمة ألوان الكرة -->
+<div class="menu" id="colorsMenu" style="display:none">
+  <button class="close-btn" onclick="hideColorsMenu()">✕</button>
+  <h2>🎨 اختر لون الكرة</h2>
+  <p>اختر اللون الذي تريده للكرة الخاصة بك:</p>
+  
+  <!-- خيارات نمط اللون -->
+  <div class="color-mode-option">
+    <button id="solidColorBtn" class="color-mode-btn active" onclick="setColorMode('solid')">لون صلب</button>
+    <button id="gradientColorBtn" class="color-mode-btn" onclick="setColorMode('gradient')">لون متدرج</button>
+  </div>
+  
+  <div class="color-palette" id="colorPalette">
+    <!-- سيتم ملؤها بالألوان -->
+  </div>
+  
+  <div class="customization-option">
+    <label>تخصيص اللون:</label>
+    <input type="color" id="customColorPicker" value="#ffffff">
+    <button onclick="applyCustomColor()">تطبيق</button>
+  </div>
+  
+  <button onclick="resetBallColor()" style="margin-top:15px">🔁 إعادة تعيين اللون</button>
+</div>
+
+<!-- نافذة التوقف -->
+<div class="msgOverlay" id="pauseOverlay" style="display:none">
+  <div class="msgBox pause-menu">
+    <h2>⏸️ التوقف</h2>
+    <button onclick="resumeGame()">⏵ مواصلة اللعب</button>
+    <button onclick="restartStage()">🔄 إعادة المرحلة</button>
+    <button onclick="backToMainMenu()">🏠 القائمة الرئيسية</button>
+  </div>
+</div>
+
+<div class="msgOverlay" id="msgOverlay">
+  <div class="msgBox" id="msgBox">
+    <h2 id="msgTitle">مبروك!</h2>
+    <p id="msgText">لقد أكملت المرحلة بنجاح!</p>
+    <div id="msgButtons"></div>
+  </div>
+</div>
+
+<div class="msgOverlay" id="storeOverlay" style="display:none">
+  <div class="msgBox store">
+    <button class="close-btn" onclick="hideStore()">✕</button>
+    <h2>المتجر 🛒</h2>
+    <div id="storeItems">
+      <!-- سيتم ملؤها بالعناصر -->
+    </div>
+  </div>
+</div>
+
+<div class="msgOverlay" id="skinsOverlay" style="display:none">
+  <div class="msgBox store">
+    <button class="close-btn" onclick="hideSkins()">✕</button>
+    <h2>السكنات 🎨</h2>
+    <div id="skinsList">
+      <!-- سيتم ملؤها بالسكنات -->
+    </div>
+  </div>
+</div>
+
+<div class="msgOverlay" id="customizationOverlay" style="display:none">
+  <div class="msgBox store">
+    <button class="close-btn" onclick="hideCustomization()">✕</button>
+    <h2>التخصيص المتقدم ⚙️</h2>
+    <div class="customization-panel">
+      <h3>مؤثرات بصرية</h3>
+      <div class="customization-option">
+        <label>جودة الجسيمات:</label>
+        <select id="particleQuality">
+          <option value="low">منخفضة</option>
+          <option value="medium">متوسطة</option>
+          <option value="high">عالية</option>
+        </select>
+      </div>
+      <div class="customization-option">
+        <label>تأثيرات الإضاءة:</label>
+        <select id="lightingEffects">
+          <option value="basic">أساسية</option>
+          <option value="advanced">متقدمة</option>
+        </select>
+      </div>
+      <div class="customization-option">
+        <label>مؤثرات ما بعد المعالجة:</label>
+        <input type="checkbox" id="postProcessing">
+      </div>
+    </div>
+    <div class="customization-panel">
+      <h3>إعدادات اللعب</h3>
+      <div class="customization-option">
+        <label>حساسية التحكم:</label>
+        <input type="range" id="controlSensitivity" min="0.5" max="2" step="0.1" value="1">
+        <span id="sensitivityValue">1.0</span>
+      </div>
+      <div class="customization-option">
+        <label>تأثير الجاذبية:</label>
+        <input type="range" id="gravityEffect" min="0.5" max="2" step="0.1" value="1">
+        <span id="gravityValue">1.0</span>
+      </div>
+    </div>
+    <button class="reset-btn" onclick="resetGameData()">🔄 إعادة تعيين اللعبة</button>
+  </div>
+</div>
+
+<script src="three.min.js"></script>
+<script src="GLTFLoader.js"></script>
+<script>
+(async function(){
+  // العناصر الأساسية
+  const canvas = document.getElementById('game');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias: true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.shadowMap.enabled = true;
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x070218, 0.03);
+
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.5, 500);
+  camera.position.set(0, 6, 14);
+
+  // إضافة TextureLoader لتحميل القوام
+  const textureLoader = new THREE.TextureLoader();
+
+  // متغيرات النماذج ثلاثية الأبعاد
+  let modelLoader = null;
+  let availableModels = {};
+  let currentBallModel = null;
+
+  // تحميل النماذج ثلاثية الأبعاد - يدعم GLTF و GLB
+  async function load3DModels() {
+      if (typeof THREE.GLTFLoader !== 'undefined') {
+          modelLoader = new THREE.GLTFLoader();
+          console.log('✅ GLTFLoader جاهز للاستخدام');
+      } else {
+          console.log('⚠️ GLTFLoader غير متوفر، استخدام الأشكال المدمجة');
+      }
+  }
+
+  // نظام التأثيرات المرئية الفريدة للكرات - محدث ومتطور
+  const BALL_EFFECTS = {
+      'fire_ball': {
+          shape: 'fire_sphere',
+          particles: true,
+          particleColor: 0xff4400,
+          particleRate: 15,
+          light: true,
+          lightColor: 0xff3300,
+          lightIntensity: 2.5,
+          fire: {
+              enabled: true,
+              flameCount: 16,
+              flameSpeed: 2.5,
+              flickerIntensity: 0.4,
+              smokeEffect: true
+          }
+      },
+      'ice_core': {
+          shape: 'ice_crystal',
+          particles: true,
+          particleColor: 0xa3e6ff,
+          particleRate: 20,
+          light: true,
+          lightColor: 0xa3e6ff,
+          lightIntensity: 1.8,
+          ice: {
+              enabled: true,
+              shardCount: 12,
+              pulseSpeed: 2.0,
+              frostEffect: true,
+              iceCrystals: true
+          }
+      },
+      'magic_cube': {
+          shape: 'magic_cube',
+          particles: true,
+          particleColor: 0xff6b6b,
+          particleRate: 8,
+          light: true,
+          lightColor: 0xff6b6b,
+          lightIntensity: 1.5,
+          crystal: {
+              enabled: true,
+              facetCount: 16,
+              refraction: true,
+              sparkleRate: 0.8,
+              rainbowEffect: true
+          }
+      },
+      'spike_ball': {
+        shape: 'fork_ball',
+        particles: true,
+        particleColor: 0x00ff00,
+        particleRate: 10,
+        light: true,
+        lightColor: 0x00ff00,
+        lightIntensity: 1.5,
+        spikes: {
+            enabled: true,
+            spikeCount: 100,
+            spikeLength: 0.6,
+            pulseEffect: true,
+            rotationSpeed: 2.0
+        }
+    },
+      'default': {
+          shape: 'sphere',
+          particles: false,
+          light: false
+      },
+      'energy_ball': {
+          shape: 'energy_sphere',
+          particles: true,
+          particleColor: 0xaefaff,
+          particleRate: 25,
+          light: true,
+          lightColor: 0xaefaff,
+          lightIntensity: 1.8,
+          pulse: {
+              enabled: true,
+              speed: 2.0,
+              minIntensity: 0.4,
+              maxIntensity: 1.3,
+              energyArcs: true
+          }
+      },
+      'galaxy_sphere': {
+          shape: 'galaxy',
+          particles: true,
+          particleColor: 0x9d4edd,
+          particleRate: 30,
+          light: true,
+          lightColor: 0x9d4edd,
+          lightIntensity: 2.2,
+          lava: {
+              enabled: true,
+              magmaGlow: true,
+              bubbleRate: 1.2,
+              heatHaze: true,
+              volcanicEruption: true
+          }
+      },
+      'quantum_cube': {
+          shape: 'quantum_cube',
+          particles: true,
+          particleColor: 0x00bbf9,
+          particleRate: 6,
+          light: true,
+          lightColor: 0x00bbf9,
+          lightIntensity: 1.6,
+          rune: {
+              enabled: true,
+              symbolCount: 6,
+              glowPattern: "circular",
+              ancientPower: true,
+              floatingSymbols: true
+          }
+      },
+      'ancient_rune': {
+          shape: 'rune_stone',
+          particles: true,
+          particleColor: 0xf9c74f,
+          particleRate: 8,
+          light: true,
+          lightColor: 0xf9c74f,
+          lightIntensity: 1.5,
+          rune: {
+              enabled: true,
+              symbolCount: 6,
+              glowPattern: "circular",
+              ancientPower: true,
+              floatingSymbols: true
+          }
+      },
+      'crystal_diamond': {
+          shape: 'diamond',
+          particles: true,
+          particleColor: 0x4ecdc4,
+          particleRate: 12,
+          light: true,
+          lightColor: 0x4ecdc4,
+          lightIntensity: 1.8,
+          crystal: {
+              enabled: true,
+              facetCount: 16,
+              refraction: true,
+              sparkleRate: 0.8,
+              rainbowEffect: true
+          }
+      },
+      'lava_orb': {
+          shape: 'lava_orb',
+          particles: true,
+          particleColor: 0xff6b35,
+          particleRate: 15,
+          light: true,
+          lightColor: 0xff6b35,
+          lightIntensity: 2.0,
+          lava: {
+              enabled: true,
+              magmaGlow: true,
+              bubbleRate: 1.2,
+              heatHaze: true,
+              volcanicEruption: true
+          }
+      }
+  };
+
+  // دوال إنشاء الأشكال الفريدة لكل سكن
+  function createUniqueGeometry(skinId, size = 1.0) {
+      const effects = BALL_EFFECTS[skinId];
+      if (!effects) {
+          return new THREE.SphereGeometry(size, 32, 32);
+      }
+
+      switch(effects.shape) {
+          case 'fire_sphere': // كرة نارية مشوهة
+              return createDistortedSphere(size, 0.2, 10, 0.3);
+              
+          case 'ice_crystal': // كرة جليدية متعددة الأوجه
+              return createFacetedSphere(size, 24, 0.8);
+              
+          case 'fork_ball': // كرة شوكية - السكن الجديد
+            return createSpikyBallGeometry(size, 100, 0.6);
+              
+          case 'diamond': // شكل ماسة
+              return createDiamondGeometry(size, 16);
+              
+          case 'energy_sphere': // كرة طاقوية
+              return createEnergySphereGeometry(size, 6);
+              
+          case 'lava_orb': // كرة حمم
+              return createLavaOrbGeometry(size);
+              
+          case 'rune_stone': // حجر روني
+              return createRuneStoneGeometry(size);
+              
+          case 'magic_cube': // مكعب سحري
+              return createMagicCubeGeometry(size);
+              
+          case 'galaxy': // شكل مجرة
+              return createGalaxyGeometry(size, 4);
+              
+          case 'quantum_cube': // مكعب كمي
+              return createQuantumCubeGeometry(size);
+              
+          default:
+              return new THREE.SphereGeometry(size, 32, 32);
+      }
+  }
+
+  // دوال إنشاء الأشكال الفريدة
+  function createDistortedSphere(size, distortion, spikes, spikeHeight) {
+      const geometry = new THREE.SphereGeometry(size, 32, 32);
+      const position = geometry.attributes.position;
+      
+      for (let i = 0; i < position.count; i++) {
+          const x = position.getX(i);
+          const y = position.getY(i);
+          const z = position.getZ(i);
+          
+          // إضافة تشويه عشوائي
+          const noise = (Math.sin(x * 10) + Math.cos(y * 8) + Math.sin(z * 12)) * 0.1 * distortion;
+          
+          // إضافة spikes في نقاط محددة
+          let spikeEffect = 0;
+          if (i % Math.floor(position.count / spikes) === 0) {
+              spikeEffect = spikeHeight;
+          }
+          
+          const newX = x * (1 + noise + spikeEffect);
+          const newY = y * (1 + noise + spikeEffect);
+          const newZ = z * (1 + noise + spikeEffect);
+          
+          position.setXYZ(i, newX, newY, newZ);
+      }
+      
+      geometry.computeVertexNormals();
+      return geometry;
+  }
+
+  function createFacetedSphere(size, facets, sharpness) {
+      const geometry = new THREE.IcosahedronGeometry(size, Math.floor(facets / 20));
+      
+      // جعل الأوجه أكثر حدة
+      const position = geometry.attributes.position;
+      for (let i = 0; i < position.count; i++) {
+          const vector = new THREE.Vector3(
+              position.getX(i),
+              position.getY(i),
+              position.getZ(i)
+          ).normalize().multiplyScalar(size * (1 + sharpness * 0.3));
+          
+          position.setXYZ(i, vector.x, vector.y, vector.z);
+      }
+      
+      geometry.computeVertexNormals();
+      return geometry;
+  }
+
+  function createMagicCubeGeometry(size) {
+      const geometry = new THREE.BoxGeometry(size, size, size, 4, 4, 4);
+      
+      // إضافة تفاصيل سحرية على الأسطح
+      const position = geometry.attributes.position;
+      const newPositions = [];
+      
+      for (let i = 0; i < position.count; i++) {
+          const x = position.getX(i);
+          const y = position.getY(i);
+          const z = position.getZ(i);
+          
+          // إضافة أنماط رونية على الأسطح
+          const runePattern = Math.sin(x * 20) * Math.sin(z * 20) * 0.05;
+          const newY = y + runePattern;
+          
+          newPositions.push(x, newY, z);
+      }
+      
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(newPositions, 3));
+      geometry.computeVertexNormals();
+      return geometry;
+  }
+
+  function createDiamondGeometry(size, facets) {
+      // إنشاء ماسة مع العديد من الأوجه
+      const geometry = new THREE.OctahedronGeometry(size, Math.floor(facets / 8));
+      
+      // جعل الشكل أكثر بريقاً كالماسة الحقيقية
+      const position = geometry.attributes.position;
+      for (let i = 0; i < position.count; i++) {
+          const vector = new THREE.Vector3(
+              position.getX(i),
+              position.getY(i),
+              position.getZ(i)
+          );
+          
+          // تضييق القاعدة وتوسيع القمة لمظهر الماسة
+          if (vector.y > 0) {
+              vector.multiplyScalar(1.3); // قمة أوسع
+          } else {
+              vector.multiplyScalar(0.7); // قاعدة أضيق
+          }
+          
+          position.setXYZ(i, vector.x, vector.y, vector.z);
+      }
+      
+      geometry.computeVertexNormals();
+      return geometry;
+  }
+
+  function createEnergySphereGeometry(size, arcs) {
+      const geometry = new THREE.SphereGeometry(size, 24, 18);
+      
+      // إضافة أقواس طاقوية
+      const position = geometry.attributes.position;
+      for (let i = 0; i < position.count; i++) {
+          const angle = (i / position.count) * Math.PI * 2 * arcs;
+          const arcEffect = Math.sin(angle) * 0.15;
+          
+          const x = position.getX(i) * (1 + arcEffect);
+          const y = position.getY(i);
+          const z = position.getZ(i) * (1 + arcEffect);
+          
+          position.setXYZ(i, x, y, z);
+      }
+      
+      geometry.computeVertexNormals();
+      return geometry;
+  }
+
+  function createGalaxyGeometry(size, spiralArms) {
+      const geometry = new THREE.SphereGeometry(size, 36, 24);
+      
+      // إضافة شكل حلزوني للمجرة
+      const position = geometry.attributes.position;
+      for (let i = 0; i < position.count; i++) {
+          const x = position.getX(i);
+          const y = position.getY(i);
+          const z = position.getZ(i);
+          
+          const angle = Math.atan2(z, x);
+          const radius = Math.sqrt(x*x + z*z);
+          
+          // تأثير الأذرع الحلزونية
+          const spiralEffect = Math.sin(angle * spiralArms + radius * 10) * 0.2;
+          const newRadius = radius * (1 + spiralEffect);
+          
+          const newX = (newRadius / radius) * x;
+          const newZ = (newRadius / radius) * z;
+          
+          position.setXYZ(i, newX, y, newZ);
+      }
+      
+      geometry.computeVertexNormals();
+      return geometry;
+  }
+
+  function createLavaOrbGeometry(size) {
+      const geometry = new THREE.SphereGeometry(size, 32, 24);
+      
+      // إضافة سطح غير منتظم يشبه الحمم البركانية
+      const position = geometry.attributes.position;
+      const time = performance.now() * 0.001;
+      
+      for (let i = 0; i < position.count; i++) {
+          const x = position.getX(i);
+          const y = position.getY(i);
+          const z = position.getZ(i);
+          
+          // تأثير الحمم مع تموجات متعددة
+          const lavaNoise1 = Math.sin(x * 12 + time) * 0.08;
+          const lavaNoise2 = Math.cos(y * 10 + time * 1.5) * 0.06;
+          const lavaNoise3 = Math.sin(z * 14 + time * 0.8) * 0.05;
+          
+          const totalNoise = lavaNoise1 + lavaNoise2 + lavaNoise3;
+          const vector = new THREE.Vector3(x, y, z).normalize().multiplyScalar(size * (1 + totalNoise));
+          
+          position.setXYZ(i, vector.x, vector.y, vector.z);
+      }
+      
+      geometry.computeVertexNormals();
+      return geometry;
+  }
+
+  function createQuantumCubeGeometry(size) {
+      const geometry = new THREE.BoxGeometry(size, size, size, 6, 6, 6);
+      
+      // إضافة تأثير تموج كمي
+      const position = geometry.attributes.position;
+      const time = performance.now() * 0.001;
+      
+      for (let i = 0; i < position.count; i++) {
+          const x = position.getX(i);
+          const y = position.getY(i);
+          const z = position.getZ(i);
+          
+          const quantumEffect = Math.sin(x * 15 + time) * Math.cos(z * 15 + time) * 0.08;
+          const newX = x * (1 + quantumEffect);
+          const newZ = z * (1 + quantumEffect);
+          
+          position.setXYZ(i, newX, y, newZ);
+      }
+      
+      geometry.computeVertexNormals();
+      return geometry;
+  }
+
+  function createRuneStoneGeometry(size) {
+      // أسطوانة منقوشة بالرموز
+      const geometry = new THREE.CylinderGeometry(size * 0.6, size * 0.6, size * 1.2, 12, 4);
+      
+      // إضافة نقوش رونية على الجوانب
+      const position = geometry.attributes.position;
+      for (let i = 0; i < position.count; i++) {
+          const x = position.getX(i);
+          const y = position.getY(i);
+          const z = position.getZ(i);
+          
+          const angle = Math.atan2(z, x);
+          const heightFactor = Math.abs(y) / (size * 0.6);
+          
+          // إضافة نقوش رونية على الجوانب فقط (ليس الأعلى أو الأسفل)
+          if (heightFactor < 0.9) {
+                        const runeDepth = Math.sin(angle * 8) * Math.cos(y * 10) * 0.15;
+              const vector = new THREE.Vector3(x, y, z).normalize();
+              vector.multiplyScalar(size * (1 + runeDepth));
+              position.setXYZ(i, vector.x, vector.y, vector.z);
+          }
+      }
+      
+            geometry.computeVertexNormals();
+      return geometry;
+  }
+
+  // دالة إنشاء الكرة الشوكية المبسطة
+  function createSpikyBallGeometry(size, spikeCount, spikeLength) {
+    const geometry = new THREE.SphereGeometry(size, 32, 32);
+    const position = geometry.attributes.position;
+    
+    for (let i = 0; i < position.count; i++) {
+        const x = position.getX(i);
+        const y = position.getY(i);
+        const z = position.getZ(i);
+        
+        // حساب المسافة من المركز
+        const distance = Math.sqrt(x*x + y*y + z*z);
+        const normalizedX = x / distance;
+        const normalizedY = y / distance;
+        const normalizedZ = z / distance;
+        
+        // إضافة تأثير الشوكة باستخدام دالة noise
+        const spikeNoise = Math.sin(normalizedX * 22) * Math.cos(normalizedY * 22) * Math.sin(normalizedZ * 22);
+        const spikeEffect = spikeNoise > 0.7 ? spikeLength : 0;
+        
+        const newX = normalizedX * (size + spikeEffect);
+        const newY = normalizedY * (size + spikeEffect);
+        const newZ = normalizedZ * (size + spikeEffect);
+        
+        position.setXYZ(i, newX, newY, newZ);
+    }
+    
+    geometry.computeVertexNormals();
+    return geometry;
+}
+
+  // إنشاء تأثيرات بصرية متقدمة للكرة
+  function createBallEffects(ball, skinId) {
+      const effects = BALL_EFFECTS[skinId] || BALL_EFFECTS['default'];
+      
+      // تنظيف التأثيرات القديمة
+      if (ball.userData.effects) {
+          ball.userData.effects.forEach(effect => {
+              if (effect.light) scene.remove(effect.light);
+              if (effect.particles) clearInterval(effect.particles);
+              if (effect.specialEffect) clearInterval(effect.specialEffect);
+          });
+      }
+      
+      ball.userData.effects = [];
+      
+      // إضافة إضاءة خاصة
+      if (effects.light) {
+          const ballLight = new THREE.PointLight(effects.lightColor, effects.lightIntensity, 8);
+          ball.add(ballLight);
+          ball.userData.effects.push({ light: ballLight });
+      }
+      
+      // إضافة جسيمات مستمرة
+      if (effects.particles) {
+          const particleInterval = setInterval(() => {
+              if (gameActive && ball) {
+                  createAdvancedParticle('effect_trail', ball.position, effects.particleColor);
+              }
+          }, 1000 / effects.particleRate);
+          
+          ball.userData.effects.push({ particles: particleInterval });
+      }
+      
+      // تأثيرات خاصة حسب نوع السكن
+      if (effects.fire && effects.fire.enabled) {
+          const fireInterval = setInterval(() => {
+              if (gameActive && ball) {
+                  createFireEffect(ball.position);
+              }
+          }, 100);
+          ball.userData.effects.push({ specialEffect: fireInterval });
+      }
+      
+      if (effects.ice && effects.ice.enabled) {
+          const iceInterval = setInterval(() => {
+              if (gameActive && ball && Math.random() < 0.3) {
+                  createIceEffect(ball.position);
+              }
+          }, 500);
+          ball.userData.effects.push({ specialEffect: iceInterval });
+      }
+      
+      if (effects.disco && effects.disco.enabled) {
+          const discoInterval = setInterval(() => {
+              if (gameActive && ball) {
+                  createDiscoEffect(ball.position);
+              }
+          }, 200);
+          ball.userData.effects.push({ specialEffect: discoInterval });
+      }
+  }
+
+  // تأثيرات خاصة لكل سكن
+  function createFireEffect(position) {
+      const fireParticle = {
+          mesh: null,
+          velocity: new THREE.Vector3(
+              (Math.random() - 0.5) * 2,
+              Math.random() * 3 + 2,
+              (Math.random() - 0.5) * 2
+          ),
+          life: 1.0,
+          maxLife: 1.5
+      };
+
+      const size = 0.1 + Math.random() * 0.15;
+      const geometry = new THREE.SphereGeometry(size, 8, 6);
+      const material = new THREE.MeshBasicMaterial({
+          color: new THREE.Color().setHSL(0.05 + Math.random() * 0.1, 1, 0.5 + Math.random() * 0.3),
+          transparent: true
+      });
+
+      fireParticle.mesh = new THREE.Mesh(geometry, material);
+      fireParticle.mesh.position.copy(position);
+      scene.add(fireParticle.mesh);
+      activeParticles.push(fireParticle);
+  }
+
+  function createIceEffect(position) {
+    const iceParticle = {
+        mesh: null,
+        velocity: new THREE.Vector3(
+            (Math.random() - 0.5) * 1.5,
+            Math.random() * 1.5,
+            (Math.random() - 0.5) * 1.5
+        ),
+        life: 2.0,
+        maxLife: 2.0
+    };
+
+    const size = 0.05 + Math.random() * 0.08;
+    const geometry = new THREE.OctahedronGeometry(size, 0);
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xa3e6ff,
+        transparent: true,
+        opacity: 0.7
+    });
+
+    iceParticle.mesh = new THREE.Mesh(geometry, material);
+    iceParticle.mesh.position.copy(position);
+    scene.add(iceParticle.mesh);
+    activeParticles.push(iceParticle);
+}
+
+function createDiscoEffect(position) {
+    const colors = [0xff006e, 0x00bbf9, 0x9d4edd, 0xf9c74f, 0x4ecdc4];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    
+    createAdvancedParticle('disco_glow', position, color);
+}
+
+// نظام الألوان المحسن - متغيرات جديدة
+let colorMode = 'solid'; // 'solid' أو 'gradient'
+let ballColors = {
+    available: [
+        { name: "أبيض ناصع", value: "#ffffff", hex: 0xffffff },
+        { name: "أحمر فاتح", value: "#ff4444", hex: 0xff4444 },
+        { name: "أزرق ساطع", value: "#4444ff", hex: 0x4444ff },
+        { name: "أخضر لامع", value: "#44ff44", hex: 0x44ff44 },
+        { name: "أصفر ذهبي", value: "#ffff44", hex: 0xffff44 },
+        { name: "بنفسجي فاتح", value: "#ff44ff", hex: 0xff44ff },
+        { name: "تركواز لامع", value: "#44ffff", hex: 0x44ffff },
+        { name: "برتقالي مشع", value: "#ff8844", hex: 0xff8844 },
+        { name: "وردي فاتح", value: "#ff88cc", hex: 0xff88cc },
+        { name: "ذهبي لامع", value: "#ffd700", hex: 0xffd700 },
+        { name: "فيروزي", value: "#40e0d0", hex: 0x40e0d0 },
+        { name: "أرجواني", value: "#9370db", hex: 0x9370db },
+        { name: "أحمر مرجاني", value: "#ff7f50", hex: 0xff7f50 },
+        { name: "أخضر بحري", value: "#2e8b57", hex: 0x2e8b57 },
+        { name: "أزرق سماوي", value: "#87ceeb", hex: 0x87ceeb }
+    ],
+    current: "#ffffff",
+    custom: "#ffffff"
+};
+
+// دالة محسنة لتطبيق اللون على كل أجزاء الكرة
+function applyBallColor(colorHex) {
+    if (!ball || !currentBallModel) return;
+    
+    // تطبيق اللون على النموذج الرئيسي للكرة
+    currentBallModel.traverse(child => {
+        if (child.isMesh) {
+            if (colorMode === 'solid') {
+                // وضع اللون الصلب - استخدام MeshBasicMaterial
+                child.material = new THREE.MeshBasicMaterial({
+                    color: colorHex,
+                    transparent: false
+                });
+            } else {
+                // وضع التدرج - استخدام MeshStandardMaterial مع إعدادات محسنة
+                child.material = new THREE.MeshStandardMaterial({
+                    color: colorHex,
+                    emissive: colorHex,
+                    emissiveIntensity: 0.1, // تخفيف شديد للتوهج
+                    metalness: 0.1,         // تقليل المعدنية
+                    roughness: 0.8,         // زيادة الخشونة
+                    transparent: false
+                });
+            }
+            child.material.needsUpdate = true;
+        }
+    });
+    
+    // تحديث الكرة الأساسية أيضاً إذا كانت مرئية
+    if (ball.visible) {
+        if (colorMode === 'solid') {
+            ball.material = new THREE.MeshBasicMaterial({
+                color: colorHex,
+                transparent: false
+            });
+        } else {
+            ball.material = new THREE.MeshStandardMaterial({
+                color: colorHex,
+                emissive: colorHex,
+                emissiveIntensity: 0.1,
+                metalness: 0.1,
+                roughness: 0.8,
+                transparent: false
+            });
+        }
+        ball.material.needsUpdate = true;
+    }
+    
+    // تحديث تأثيرات الإضاءة
+    updateBallLighting(colorHex);
+}
+
+// دالة لتحديث إضاءة الكرة
+function updateBallLighting(colorHex) {
+    // تحديث لون الضوء حول الكرة
+    ballLight.color.setHex(colorHex);
+    
+    // ضبط شدة الإضاءة بناءً على سطوع اللون
+    const brightness = getColorBrightness(colorHex);
+    ballLight.intensity = 0.8 + (brightness * 0.4);
+}
+
+// دالة لحساب سطوع اللون
+function getColorBrightness(hexColor) {
+    const r = (hexColor >> 16) & 0xff;
+    const g = (hexColor >> 8) & 0xff;
+    const b = hexColor & 0xff;
+    
+    // حساب السطوع باستخدام معادلة NTSC
+    return (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+}
+
+// دالة لتعيين نمط اللون
+function setColorMode(mode) {
+    colorMode = mode;
+    
+    // تحديث واجهة الأزرار
+    document.getElementById('solidColorBtn').classList.toggle('active', mode === 'solid');
+    document.getElementById('gradientColorBtn').classList.toggle('active', mode === 'gradient');
+    
+    // إعادة تطبيق اللون الحالي بالنمط الجديد
+    const currentColorHex = parseInt(ballColors.current.replace('#', ''), 16);
+    applyBallColor(currentColorHex);
+    
+    saveGameData();
+}
+
+// دالة محسنة لتطبيق النماذج الفريدة للكرة
+async function applyBallModel(ball, skinData) {
+    // تنظيف النموذج القديم
+    if (currentBallModel) {
+        scene.remove(currentBallModel);
+        currentBallModel = null;
+    }
+    
+    // تنظيف تأثيرات السكن القديم
+    cleanupSkinEffects(ball);
+    
+    let modelApplied = false;
+    
+    // استخدام الشكل الفريد لكل سكن
+    try {
+        const geometry = createUniqueGeometry(skinData.id, 0.6);
+        
+        // استخدام اللون المختار بدلاً من لون السكن
+        const selectedColor = parseInt(ballColors.current.replace('#', ''), 16);
+        
+        let material;
+        if (colorMode === 'solid') {
+            material = new THREE.MeshBasicMaterial({
+                color: selectedColor,
+                transparent: false
+            });
+        } else {
+            material = new THREE.MeshStandardMaterial({
+                color: selectedColor,
+                emissive: selectedColor,
+                emissiveIntensity: 0.1,
+                metalness: 0.1,
+                roughness: 0.8,
+                transparent: false
+            });
+        }
+        
+        currentBallModel = new THREE.Mesh(geometry, material);
+        currentBallModel.position.copy(ball.position);
+        currentBallModel.castShadow = true;
+        currentBallModel.receiveShadow = true;
+        scene.add(currentBallModel);
+        ball.visible = false;
+        modelApplied = true;
+        console.log(`✅ تم إنشاء الشكل الفريد لسكن: ${skinData.id}`);
+        
+    } catch (error) {
+        console.error('❌ خطأ في إنشاء الشكل الفريد:', error);
+    }
+    
+    // إضافة التأثيرات الخاصة الفريدة لكل سكن
+    createUniqueSkinEffects(ball, skinData.id);
+    
+    // تطبيق التأثيرات البصرية في جميع الحالات
+    createBallEffects(ball, skinData.id);
+    
+    // تطبيق اللون المختار على جميع الأجزاء
+    applyBallColor(parseInt(ballColors.current.replace('#', ''), 16));
+}
+
+// دالة لتنظيف تأثيرات السكن القديم
+function cleanupSkinEffects(ball) {
+    const effectsToRemove = [
+        'iceShards', 'fireRing', 'magicRunes', 'galaxyStars', 'neonRings',
+        'lavaBubbles', 'quantumFields', 'discoLights', 'runeSymbols',
+        'energyArcs', 'crystalShards'
+    ];
+    
+    effectsToRemove.forEach(effect => {
+        if (ball.userData[effect]) {
+            scene.remove(ball.userData[effect]);
+            ball.userData[effect] = null;
+        }
+    });
+}
+
+// دالة محسنة لإضافة تأثيرات فريدة لكل سكن
+function createUniqueSkinEffects(ball, skinId) {
+    const effects = BALL_EFFECTS[skinId];
+    if (!effects) return;
+    
+    switch(skinId) {
+        case 'fire_ball':
+            createAdvancedFireEffects(ball);
+            break;
+        case 'ice_core':
+            createAdvancedIceEffects(ball);
+            break;
+        case 'spike_ball':  
+            createAdvancedSpikeEffects(ball);
+            break;
+        case 'magic_cube':
+            createAdvancedMagicEffects(ball);
+            break;
+        case 'crystal_diamond':
+            createAdvancedCrystalEffects(ball);
+            break;
+        case 'energy_ball':
+            createAdvancedEnergyEffects(ball);
+            break;
+        case 'galaxy_sphere':
+            createAdvancedGalaxyEffects(ball);
+            break;
+        case 'lava_orb':
+            createAdvancedLavaEffects(ball);
+            break;
+        case 'quantum_cube':
+            createAdvancedQuantumEffects(ball);
+            break;
+        case 'ancient_rune':
+            createAdvancedRuneEffects(ball);
+            break;
+    }
+}
+
+// تأثيرات النار المتقدمة
+function createAdvancedFireEffects(ball) {
+    const fireRing = new THREE.Group();
+    const flameCount = 16;
+    
+    for (let i = 0; i < flameCount; i++) {
+        const height = 0.4 + Math.random() * 0.5;
+        const geometry = new THREE.ConeGeometry(0.12, height, 8);
+        const material = new THREE.MeshBasicMaterial({
+            color: new THREE.Color().setHSL(0.05 + Math.random() * 0.15, 1, 0.6),
+            transparent: true,
+            opacity: 0.9
+        });
+
+        const flame = new THREE.Mesh(geometry, material);
+        const angle = (i / flameCount) * Math.PI * 2;
+        
+        flame.position.set(
+            Math.cos(angle) * 0.8,
+            -0.3,
+            Math.sin(angle) * 0.8
+        );
+        
+        flame.rotation.x = Math.PI / 2;
+        flame.userData.oscillation = Math.random() * Math.PI * 2;
+        flame.userData.speed = 0.5 + Math.random() * 0.5;
+        fireRing.add(flame);
+    }
+    
+    ball.add(fireRing);
+    ball.userData.fireRing = fireRing;
+
+    // إضافة دخان
+    const smokeGroup = new THREE.Group();
+    ball.userData.smokeGroup = smokeGroup;
+    ball.add(smokeGroup);
+}
+
+// تأثيرات الجليد المتقدمة
+function createAdvancedIceEffects(ball) {
+    const iceShardGroup = new THREE.Group();
+    const shardCount = 12;
+    
+    for (let i = 0; i < shardCount; i++) {
+        const size = 0.2 + Math.random() * 0.25;
+        const geometry = new THREE.ConeGeometry(size * 0.3, size, 4);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0xe6faff,
+            transparent: true,
+            opacity: 0.8,
+            metalness: 0.4,
+            roughness: 0.1,
+            emissive: 0xa3e6ff,
+            emissiveIntensity: 0.5
+        });
+
+        const shard = new THREE.Mesh(geometry, material);
+        const angle = (i / shardCount) * Math.PI * 2;
+        
+        shard.position.set(
+            Math.cos(angle) * 0.9,
+            Math.random() * 0.5 - 0.25,
+            Math.sin(angle) * 0.9
+        );
+        
+        shard.rotation.y = angle;
+        shard.userData.rotationSpeed = {
+            x: (Math.random() - 0.5) * 0.03,
+            y: (Math.random() - 0.5) * 0.04,
+            z: (Math.random() - 0.5) * 0.03
+        };
+        
+        shard.userData.floatSpeed = 0.5 + Math.random() * 0.5;
+        shard.castShadow = true;
+        iceShardGroup.add(shard);
+    }
+    
+    ball.add(iceShardGroup);
+    ball.userData.iceShards = iceShardGroup;
+}
+
+// تأثيرات الكريستال المتقدمة
+function createAdvancedCrystalEffects(ball) {
+    const crystalGroup = new THREE.Group();
+    const crystalCount = 12;
+    
+    for (let i = 0; i < crystalCount; i++) {
+        const size = 0.1 + Math.random() * 0.15;
+        const geometry = new THREE.OctahedronGeometry(size, 1);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x4ecdc4,
+            transparent: true,
+            opacity: 0.8,
+            metalness: 0.9,
+            roughness: 0.1,
+            emissive: 0x4ecdc4,
+            emissiveIntensity: 0.7
+        });
+
+        const crystal = new THREE.Mesh(geometry, material);
+        const radius = 0.8 + Math.random() * 0.4;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        
+        crystal.position.set(
+            radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.cos(phi),
+            radius * Math.sin(phi) * Math.sin(theta)
+        );
+        
+        crystal.userData.rotationSpeed = {
+            x: (Math.random() - 0.5) * 0.02,
+            y: (Math.random() - 0.5) * 0.03,
+            z: (Math.random() - 0.5) * 0.02
+        };
+        
+        crystal.castShadow = true;
+        crystalGroup.add(crystal);
+    }
+    
+    ball.add(crystalGroup);
+    ball.userData.crystalShards = crystalGroup;
+}
+
+// تأثيرات الطاقة المتقدمة
+function createAdvancedEnergyEffects(ball) {
+    const energyGroup = new THREE.Group();
+    const arcCount = 6;
+    
+    for (let i = 0; i < arcCount; i++) {
+        const geometry = new THREE.TubeGeometry(
+            new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0, -0.5, 0),
+                new THREE.Vector3(
+                    Math.cos(i * Math.PI * 2 / arcCount) * 0.8,
+                    Math.sin(performance.now() * 0.001) * 0.3,
+                    Math.sin(i * Math.PI * 2 / arcCount) * 0.8
+                ),
+                new THREE.Vector3(0, 0.5, 0)
+            ]),
+            20,
+            0.03,
+            8,
+            false
+        );
+        
+        const material = new THREE.MeshBasicMaterial({
+            color: 0xaefaff,
+            transparent: true,
+            opacity: 0.7
+        });
+
+        const arc = new THREE.Mesh(geometry, material);
+        arc.userData.phase = i * Math.PI * 2 / arcCount;
+        energyGroup.add(arc);
+    }
+    
+    ball.add(energyGroup);
+    ball.userData.energyArcs = energyGroup;
+}
+
+// تأثيرات الحمم المتقدمة
+function createAdvancedLavaEffects(ball) {
+    const lavaGroup = new THREE.Group();
+    const bubbleCount = 20;
+    
+    for (let i = 0; i < bubbleCount; i++) {
+        const size = 0.06 + Math.random() * 0.1;
+        const geometry = new THREE.SphereGeometry(size, 8, 6);
+        const material = new THREE.MeshBasicMaterial({
+            color: new THREE.Color().setHSL(0.05 + Math.random() * 0.1, 1, 0.5),
+            transparent: true,
+            opacity: 0.7
+        });
+
+        const bubble = new THREE.Mesh(geometry, material);
+        const radius = 0.7 + Math.random() * 0.5;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        
+        bubble.position.set(
+            radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.cos(phi),
+            radius * Math.sin(phi) * Math.sin(theta)
+        );
+        
+        bubble.userData.riseSpeed = 0.1 + Math.random() * 0.3;
+        bubble.userData.phase = Math.random() * Math.PI * 2;
+        lavaGroup.add(bubble);
+    }
+    
+    ball.add(lavaGroup);
+    ball.userData.lavaBubbles = lavaGroup;
+}
+
+// تأثيرات الرونية المتقدمة
+function createAdvancedRuneEffects(ball) {
+    const runeGroup = new THREE.Group();
+    const symbolCount = 8;
+    
+    for (let i = 0; i < symbolCount; i++) {
+        const size = 0.15;
+        const geometry = new THREE.TetrahedronGeometry(size, 0);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0xf9c74f,
+            transparent: true,
+            opacity: 0.9,
+            metalness: 0.7,
+            roughness: 0.2,
+            emissive: 0xf9c74f,
+            emissiveIntensity: 0.5
+        });
+
+        const symbol = new THREE.Mesh(geometry, material);
+        const angle = (i / symbolCount) * Math.PI * 2;
+        const radius = 0.9;
+        
+        symbol.position.set(
+            Math.cos(angle) * radius,
+            Math.sin(angle) * radius * 0.3,
+            Math.sin(angle) * radius
+        );
+        
+        symbol.userData.rotationSpeed = 0.02;
+        symbol.userData.floatHeight = 0.4;
+        symbol.userData.floatSpeed = 1 + Math.random() * 0.5;
+        runeGroup.add(symbol);
+    }
+    
+    ball.add(runeGroup);
+    ball.userData.runeSymbols = runeGroup;
+}
+
+// تأثيرات خاصة للكرة الشوكية
+function createAdvancedSpikeEffects(ball) {
+    const spikeGroup = new THREE.Group();
+    const spikeCount = 50;
+    
+    for (let i = 0; i < spikeCount; i++) {
+        const length = 0.3 + Math.random() * 0.3;
+        const geometry = new THREE.ConeGeometry(0.05, length, 4);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x00ff00,
+            emissive: 0x00ff00,
+            emissiveIntensity: 0.3,
+            metalness: 0.8,
+            roughness: 0.2
+        });
+
+        const spike = new THREE.Mesh(geometry, material);
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        
+        spike.position.set(
+            Math.sin(phi) * Math.cos(theta) * 0.8,
+            Math.cos(phi) * 0.8,
+            Math.sin(phi) * Math.sin(theta) * 0.8
+        );
+        
+        // توجيه الشوكة للخارج
+        spike.lookAt(ball.position);
+        spike.rotateX(Math.PI / 2);
+        
+        spike.userData.rotationSpeed = (Math.random() - 0.5) * 0.02;
+        spike.userData.pulseSpeed = 1 + Math.random();
+        spikeGroup.add(spike);
+    }
+    
+    ball.add(spikeGroup);
+    ball.userData.spikeGroup = spikeGroup;
+}
+
+// تأثيرات السحر المتقدمة
+function createAdvancedMagicEffects(ball) {
+    const magicGroup = new THREE.Group();
+    const runeCount = 8;
+    
+    for (let i = 0; i < runeCount; i++) {
+        const size = 0.1;
+        const geometry = new THREE.RingGeometry(size * 0.5, size, 16);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0xff6b6b,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide
+        });
+
+        const rune = new THREE.Mesh(geometry, material);
+        const angle = (i / runeCount) * Math.PI * 2;
+        
+        rune.position.set(
+            Math.cos(angle) * 0.8,
+            Math.sin(performance.now() * 0.001 + i) * 0.2,
+            Math.sin(angle) * 0.8
+        );
+        
+        rune.rotation.x = Math.PI / 2;
+        rune.userData.rotationSpeed = 0.01 + Math.random() * 0.02;
+        rune.userData.floatSpeed = 1 + Math.random() * 0.5;
+        magicGroup.add(rune);
+    }
+    
+    ball.add(magicGroup);
+    ball.userData.magicRunes = magicGroup;
+}
+
+// تأثيرات المجرة المتقدمة
+function createAdvancedGalaxyEffects(ball) {
+    const galaxyGroup = new THREE.Group();
+    const starCount = 30;
+    
+    for (let i = 0; i < starCount; i++) {
+        const size = 0.03 + Math.random() * 0.05;
+        const geometry = new THREE.SphereGeometry(size, 6, 4);
+        const material = new THREE.MeshBasicMaterial({
+            color: new THREE.Color().setHSL(Math.random() * 0.3 + 0.5, 0.8, 0.7),
+            transparent: true,
+            opacity: 0.9
+        });
+
+        const star = new THREE.Mesh(geometry, material);
+        const radius = 0.5 + Math.random() * 0.8;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        
+        star.position.set(
+            radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.cos(phi) * 0.3,
+            radius * Math.sin(phi) * Math.sin(theta)
+        );
+        
+        star.userData.twinkleSpeed = 2 + Math.random() * 3;
+        galaxyGroup.add(star);
+    }
+    
+    ball.add(galaxyGroup);
+    ball.userData.galaxyStars = galaxyGroup;
+}
+
+// تأثيرات الكم المتقدمة
+function createAdvancedQuantumEffects(ball) {
+    const quantumGroup = new THREE.Group();
+    const fieldCount = 4;
+    
+    for (let i = 0; i < fieldCount; i++) {
+        const geometry = new THREE.SphereGeometry(0.9, 16, 12);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0x00bbf9,
+            transparent: true,
+            opacity: 0.2,
+            wireframe: true
+        });
+
+        const field = new THREE.Mesh(geometry, material);
+        field.userData.rotationSpeed = 0.005 + Math.random() * 0.01;
+        field.userData.phase = i * Math.PI * 2 / fieldCount;
+        quantumGroup.add(field);
+    }
+    
+    ball.add(quantumGroup);
+    ball.userData.quantumFields = quantumGroup;
+}
+
+// تحديث تأثيرات السكنات الخاصة
+function updateSkinEffects(dt) {
+    if (!ball) return;
+    
+    const time = performance.now() * 0.001;
+    
+    // تحديث تأثيرات كرة النار
+    if (ball.userData.fireRing && equippedSkin === 'fire_ball') {
+        ball.userData.fireRing.children.forEach((flame, i) => {
+            flame.userData.oscillation += dt * flame.userData.speed;
+            const scale = 0.8 + Math.sin(flame.userData.oscillation) * 0.5;
+            flame.scale.set(scale, scale, scale);
+            
+            // تغيير لون اللهب
+            const hue = 0.05 + Math.sin(time * 3 + i) * 0.1;
+            flame.material.color.setHSL(hue, 1, 0.6);
+            
+            // حركة تموجية
+            flame.position.y = -0.3 + Math.sin(flame.userData.oscillation * 0.7) * 0.2;
+        });
+        
+        // إضافة دخان متقطع
+        if (Math.random() < 0.1) {
+            createAdvancedParticle('smoke', ball.position, 0x333333);
+        }
+    }
+    
+    // تحديث قطع الجليد لنواة الجليد
+    if (ball.userData.iceShards && equippedSkin === 'ice_core') {
+        ball.userData.iceShards.children.forEach(shard => {
+            shard.rotation.x += shard.userData.rotationSpeed.x;
+            shard.rotation.y += shard.userData.rotationSpeed.y;
+            shard.rotation.z += shard.userData.rotationSpeed.z;
+            
+            // حركة طفو
+            shard.position.y += Math.sin(time * shard.userData.floatSpeed + shard.position.x) * 0.002;
+        });
+        
+        // تدوير المجموعة ككل حول الكرة
+        ball.userData.iceShards.rotation.y += 0.008;
+        
+        // تأثير توهج نبضي
+        const icePulse = 0.7 + Math.sin(time * 2) * 0.3;
+        if (currentBallModel) {
+            currentBallModel.traverse(child => {
+                if (child.isMesh && child.material.emissiveIntensity !== undefined) {
+                    child.material.emissiveIntensity = icePulse;
+                }
+            });
+        }
+    }
+    
+    // تحديث تأثيرات الكرة الشوكية
+    if (ball.userData.spikeGroup && equippedSkin === 'spike_ball') {
+        ball.userData.spikeGroup.children.forEach(spike => {
+            // دوران الشوكات حول محورها
+            spike.rotation.z += spike.userData.rotationSpeed;
+            
+            // تأثير النبض للشوكات
+            const pulse = 0.8 + Math.sin(time * spike.userData.pulseSpeed) * 0.2;
+            spike.scale.set(1, pulse, 1);
+            
+            // تغيير اللون تدريجياً بين الأخضر والأزرق
+            const hue = (0.3 + Math.sin(time * 0.5 + spike.position.x) * 0.2) % 1;
+            spike.material.emissive.setHSL(hue, 1, 0.5);
+            spike.material.color.setHSL(hue, 1, 0.7);
+            
+            // حركة اهتزاز خفيفة للشوكات
+            spike.position.x += Math.sin(time * 4 + spike.position.y) * 0.001;
+            spike.position.y += Math.cos(time * 3 + spike.position.z) * 0.001;
+        });
+        
+        // تدوير المجموعة ككل حول الكرة
+        ball.userData.spikeGroup.rotation.y += dt * 0.5;
+        ball.userData.spikeGroup.rotation.x += dt * 0.3;
+        
+        // إضافة جسيمات خضراء من الشوكات
+        if (Math.random() < 0.15) {
+            ball.userData.spikeGroup.children.forEach(spike => {
+                if (Math.random() < 0.2) {
+                    const particlePos = spike.position.clone();
+                    particlePos.applyMatrix4(spike.matrixWorld);
+                    
+                    // جسيمات طاقة خضراء
+                    createAdvancedParticle('energy_spark', particlePos, 0x00ff00);
+                    
+                    // جسيمات متوهجة نادرة
+                    if (Math.random() < 0.1) {
+                        createAdvancedParticle('glow', particlePos, 0x00ff88);
+                    }
+                }
+            });
+        }
+        
+        // تأثير نبض للكرة الأساسية
+        const spikePulse = 0.5 + Math.sin(time * 2) * 0.1;
+        if (currentBallModel) {
+            currentBallModel.traverse(child => {
+                if (child.isMesh && child.material.emissiveIntensity !== undefined) {
+                    child.material.emissiveIntensity = 0.3 + spikePulse * 0.2;
+                }
+            });
+        }
+    }
+ 
+    // تحديث الكريستالات للماسة
+    if (ball.userData.crystalShards && equippedSkin === 'crystal_diamond') {
+        ball.userData.crystalShards.rotation.y += dt * 0.5;
+        ball.userData.crystalShards.children.forEach(crystal => {
+            crystal.rotation.x += crystal.userData.rotationSpeed.x;
+            crystal.rotation.y += crystal.userData.rotationSpeed.y;
+            crystal.rotation.z += crystal.userData.rotationSpeed.z;
+        });
+        
+        // تأثير قوس قزح
+        const rainbowEffect = Math.sin(time * 1.5) * 0.5 + 0.5;
+        if (currentBallModel) {
+            currentBallModel.traverse(child => {
+                if (child.isMesh) {
+                    child.material.emissive.setHSL(rainbowEffect, 0.8, 0.5);
+                }
+            });
+        }
+    }
+    
+    // تحديث فقاعات الحمم
+    if (ball.userData.lavaBubbles && equippedSkin === 'lava_orb') {
+        ball.userData.lavaBubbles.children.forEach(bubble => {
+            bubble.userData.phase += dt * bubble.userData.riseSpeed;
+            bubble.position.y += Math.sin(bubble.userData.phase) * 0.01;
+            
+            // تغيير حجم الفقاعات
+            const scale = 0.8 + Math.sin(bubble.userData.phase * 2) * 0.3;
+            bubble.scale.setScalar(scale);
+            
+            // تغيير اللون
+            const hue = 0.05 + Math.sin(bubble.userData.phase) * 0.05;
+            bubble.material.color.setHSL(hue, 1, 0.5);
+        });
+    }
+    
+        // تحديث الرموز الرونية
+    if (ball.userData.runeSymbols && equippedSkin === 'ancient_rune') {
+        ball.userData.runeSymbols.rotation.y += dt * 0.3;
+        ball.userData.runeSymbols.children.forEach(symbol => {
+            symbol.rotation.x += symbol.userData.rotationSpeed;
+            symbol.rotation.y += symbol.userData.rotationSpeed;
+            
+            // حركة طفو
+            symbol.position.y = Math.sin(time * symbol.userData.floatSpeed) * symbol.userData.floatHeight;
+            
+            // تأثير وميض
+            symbol.material.emissiveIntensity = 0.3 + Math.sin(time * 2) * 0.2;
+        });
+    }
+    
+    // تحديث أقواس الطاقة
+    if (ball.userData.energyArcs && equippedSkin === 'energy_ball') {
+        ball.userData.energyArcs.children.forEach((arc, i) => {
+            arc.userData.phase += dt * 2;
+            arc.rotation.y += dt * 0.5;
+            
+            // تحدير الشكل الديناميكي للأقواس
+            const curve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0, -0.5, 0),
+                new THREE.Vector3(
+                    Math.cos(arc.userData.phase) * 0.8,
+                    Math.sin(time * 3 + i) * 0.4,
+                    Math.sin(arc.userData.phase) * 0.8
+                ),
+                new THREE.Vector3(0, 0.5, 0)
+            ]);
+            
+            const geometry = new THREE.TubeGeometry(curve, 20, 0.03, 8, false);
+            arc.geometry.dispose();
+            arc.geometry = geometry;
+        });
+    }
+    
+    // تحديث الحقول الكمية
+    if (ball.userData.quantumFields && equippedSkin === 'quantum_cube') {
+        ball.userData.quantumFields.children.forEach(field => {
+            field.rotation.y += field.userData.rotationSpeed;
+            
+            // تأثير النبض
+            const pulse = 0.5 + Math.sin(time * 2 + field.userData.phase) * 0.3;
+            field.material.opacity = 0.3 + pulse * 0.3;
+            field.scale.setScalar(0.9 + pulse * 0.2);
+        });
+    }
+    
+    // تأثير النبض العام للكرات الطاقوية
+    if (equippedSkin === 'energy_ball') {
+        const pulseIntensity = 0.5 + Math.sin(time * 2) * 0.3;
+        if (currentBallModel) {
+            currentBallModel.traverse(child => {
+                if (child.isMesh && child.material.emissiveIntensity !== undefined) {
+                    child.material.emissiveIntensity = pulseIntensity;
+                }
+            });
+        }
+    }
+    
+    // تأثيرات إضافية للسكنات الأخرى...
+    if (ball.userData.magicRunes && equippedSkin === 'magic_cube') {
+        ball.userData.magicRunes.rotation.y += dt * 0.4;
+        ball.userData.magicRunes.children.forEach(rune => {
+            rune.rotation.x += rune.userData.rotationSpeed;
+            rune.position.y = Math.sin(time * rune.userData.floatSpeed) * 0.1;
+        });
+    }
+    
+    if (ball.userData.galaxyStars && equippedSkin === 'galaxy_sphere') {
+        ball.userData.galaxyStars.rotation.y += dt * 0.2;
+        ball.userData.galaxyStars.children.forEach(star => {
+            star.scale.setScalar(0.8 + Math.sin(time * 3 + star.position.x) * 0.3);
+        });
+    }
+}
+
+// الإضاءة
+const hemi = new THREE.HemisphereLight(0x99aaff, 0x101024, 0.6); scene.add(hemi);
+const dir = new THREE.DirectionalLight(0xfff3d8, 0.8); dir.position.set(10, 20, 10); dir.castShadow = true; scene.add(dir);
+const ballLight = new THREE.PointLight(0xaa66ff, 0.9, 10); ballLight.position.set(0, 2, 0); scene.add(ballLight);
+
+// عناصر الواجهة
+const scoreEl = document.getElementById('score');
+const coinsEl = document.getElementById('coins');
+const stageLabel = document.getElementById('stageLabel');
+const hint = document.getElementById('hint');
+const stageButtons = document.getElementById('stageButtons');
+const mainMenu = document.getElementById('mainMenu');
+const msgOverlay = document.getElementById('msgOverlay');
+const msgTitle = document.getElementById('msgTitle');
+const msgText = document.getElementById('msgText');
+const msgButtons = document.getElementById('msgButtons');
+const effectsCounter = document.getElementById('effectsCounter');
+const activeEffectsEl = document.getElementById('activeEffects');
+const powerupIndicator = document.getElementById('powerupIndicator');
+const pauseBtn = document.getElementById('pauseBtn');
+const pauseOverlay = document.getElementById('pauseOverlay');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+// متغيرات اللعبة
+let score = 0;
+let coins = 100;
+let currentStage = 0;
+let unlockedStages = [0];
+let gameActive = false;
+let gamePaused = false;
+let activeParticles = [];
+let advancedParticles = [];
+
+let CELL = 2, COLS = 7, ROWS = 20;
+let ball = null, tiles = [], traps = [], crystals = [], powerUps = [], dynamicObstacles = [];
+let pointerDown = false, startPos = null, moving = false;
+const IMPULSE = 10, FRICTION = 0.96, MAX_SPEED = 18, MIN_MOVE = 1;
+const GRAVITY = -15;
+
+// بيانات السكنات والمتجر - محدثة
+let playerSkins = [];
+let equippedSkin = null;
+let storeItems = [];
+
+// أنواع البلاطات الجديدة
+const TILE_TYPES = {
+    NORMAL: {friction: 0.90, color: 0x162040, emissive: 0x102040},
+    SLOPED: {friction: 0.85, color: 0x2244aa, emissive: 0x112266},
+    ICE: {friction: 0.8, color: 0x88ccff, emissive: 0x4466aa},
+    STICKY: {friction: 0.99, color: 0xaa44aa, emissive: 0x662266},
+    BOUNCE: {friction: 0.9, color: 0xffaa44, emissive: 0xaa6622, bounce: 1.5},
+    CONVEYOR: {friction: 0.8, color: 0x44aa88, emissive: 0x226644}
+};
+
+// نظام الطاقة والقدرات الخاصة
+const POWERUP_TYPES = {
+SHIELD: { 
+  id: 'shield', 
+  name: 'درع الحماية', 
+  duration: 8, 
+  color: 0x44aaff, 
+  icon: '🛡️',
+  effect: (ball) => {
+    ball.userData.shielded = true;
+    createAdvancedParticle('shield', ball.position, 0x44aaff);
+  },
+  update: (ball, dt) => {
+    if (ball.userData.shielded && Math.random() < 0.3) {
+      createAdvancedParticle('shield_sparkle', ball.position, 0x44aaff);
+    }
+  },
+  end: (ball) => {
+    ball.userData.shielded = false;
+    createAdvancedParticle('shield_break', ball.position, 0x44aaff);
+  }
+},
+MAGNET: { 
+  id: 'magnet', 
+  name: 'مغناطيس الكريستالات', 
+  duration: 10, 
+  color: 0xff4444, 
+  icon: '🧲',
+  effect: (ball) => {
+    ball.userData.magnet = true;
+    ball.userData.magnetStrength = 5;
+    createAdvancedParticle('magnet_field', ball.position, 0xff4444);
+  },
+  update: (ball, dt) => {
+    if (!ball.userData.magnet) return;
+    
+    crystals.forEach(crystal => {
+      if (!crystal.userData.collected) {
+        const distance = crystal.position.distanceTo(ball.position);
+        if (distance < ball.userData.magnetStrength) {
+          const direction = new THREE.Vector3()
+            .subVectors(ball.position, crystal.position)
+            .normalize();
+          crystal.position.addScaledVector(direction, dt * 10);
+          createAdvancedParticle('magnet_pull', crystal.position, 0xff4444);
+        }
+      }
+    });
+  },
+  end: (ball) => {
+    ball.userData.magnet = false;
+    createAdvancedParticle('magnet_end', ball.position, 0xff4444);
+  }
+},
+SPEED_BOOST: { 
+  id: 'speed_boost', 
+  name: 'تعزيز السرعة', 
+  duration: 6, 
+  color: 0x44ff44, 
+  icon: '⚡',
+  effect: (ball) => {
+    ball.userData.speedBoost = 1.8;
+    createAdvancedParticle('speed_trail', ball.position, 0x44ff44);
+  },
+  update: (ball, dt) => {
+    if (ball.userData.speedBoost && ball.userData.velocity.length() > 2) {
+      createAdvancedParticle('speed_spark', ball.position, 0x44ff44);
+    }
+  },
+  end: (ball) => {
+    ball.userData.speedBoost = 1.0;
+    createAdvancedParticle('speed_end', ball.position, 0x44ff44);
+  }
+}
+};
+
+let activePowerUps = [];
+let playerCustomization = {
+particleQuality: 'medium',
+lightingEffects: 'basic',
+postProcessing: false,
+controlSensitivity: 1.0,
+gravityEffect: 1.0
+};
+
+// المراحل المضمنة في الكود بدلاً من ملفات خارجية
+const embeddedStages = [
+    // المرحلة 1
+   {
+  "name": "المرحلة 1",
+  "CELL": 2,
+  "COLS": 7,
+  "ROWS": 12,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -2, "height": 1.2},
+    {"x": 0, "z": -6, "height": 1.2},
+    {"x": 0, "z": -10, "height": 1.2}
+  ],
+  "traps": [],
+  "powerUps": [
+    {"x": 0, "z": -4, "type": "shield", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+    // المرحلة 2
+   {
+  "name": "المرحلة 2",
+  "CELL": 2,
+  "COLS": 7,
+  "ROWS": 12,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -10, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -2, "height": 1.2},
+    {"x": 2, "z": -4, "height": 1.2},
+    {"x": -2, "z": -10, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -4, "height": 0.8, "period": 2000, "phase": 0}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -6, "type": "magnet", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 3",
+  "CELL": 2,
+  "COLS": 7,
+  "ROWS": 14,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "ice"},
+    {"x": 0, "z": -4, "height": 0.1, "type": "ice"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "ice"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.1, "type": "ice"},
+    {"x": 2, "z": -12, "height": 0.1, "type": "ice"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -4, "height": 1.2},
+    {"x": 2, "z": -8, "height": 1.2},
+    {"x": 2, "z": -12, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 2, "z": -11, "height": 0.8, "period": 1500, "phase": 500}
+  ],
+  "powerUps": [
+    {"x": 0, "z": -6, "type": "speed_boost", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 4",
+  "CELL": 2,
+  "COLS": 9,
+  "ROWS": 16,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -14, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": -2, "z": -4, "height": 1.2},
+    {"x": 2, "z": -8, "height": 1.2},
+    {"x": -2, "z": -12, "height": 1.2},
+    {"x": 0, "z": -14, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -4, "height": 0.8, "period": 1200, "phase": 0},
+    {"x": 0, "z": -8, "height": 0.8, "period": 1200, "phase": 600},
+    {"x": 0, "z": -12, "height": 0.8, "period": 1200, "phase": 300}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -6, "type": "shield", "height": 1.5},
+    {"x": -2, "z": -10, "type": "magnet", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 5",
+  "CELL": 2,
+  "COLS": 9,
+  "ROWS": 18,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -16, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 2, "z": -4, "height": 1.2},
+    {"x": -2, "z": -8, "height": 1.2},
+    {"x": 2, "z": -12, "height": 1.2},
+    {"x": 0, "z": -16, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -4, "height": 0.8, "period": 1000, "phase": 0},
+    {"x": 0, "z": -8, "height": 0.8, "period": 1000, "phase": 500},
+    {"x": 0, "z": -12, "height": 0.8, "period": 1000, "phase": 250},
+    {"x": 2, "z": -10, "height": 0.8, "period": 1000, "phase": 750}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -6, "type": "speed_boost", "height": 1.5},
+    {"x": -2, "z": -10, "type": "shield", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 6",
+  "CELL": 2,
+  "COLS": 9,
+  "ROWS": 16,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -14, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 2, "z": -4, "height": 1.2},
+    {"x": -2, "z": -8, "height": 1.2},
+    {"x": 2, "z": -12, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -4, "height": 0.8, "period": 1500, "phase": 0},
+    {"x": 0, "z": -8, "height": 0.8, "period": 1500, "phase": 500},
+    {"x": 0, "z": -12, "height": 0.8, "period": 1500, "phase": 1000}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -6, "type": "shield", "height": 1.5},
+    {"x": -2, "z": -10, "type": "magnet", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 7",
+  "CELL": 2,
+  "COLS": 11,
+  "ROWS": 18,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -3, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -3, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -9, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -9, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -15, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": -2, "z": -3, "height": 1.2},
+    {"x": 2, "z": -3, "height": 1.2},
+    {"x": -4, "z": -6, "height": 1.2},
+    {"x": 4, "z": -6, "height": 1.2},
+    {"x": 0, "z": -12, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -5, "height": 0.8, "period": 1200, "phase": 0},
+    {"x": 0, "z": -9, "height": 0.8, "period": 1200, "phase": 400},
+    {"x": 0, "z": -13, "height": 0.8, "period": 1200, "phase": 800}
+  ],
+  "powerUps": [
+    {"x": 0, "z": -6, "type": "magnet", "height": 1.5},
+    {"x": 0, "z": -9, "type": "shield", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 8",
+  "CELL": 2,
+  "COLS": 11,
+  "ROWS": 20,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -16, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -18, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": -4, "z": -4, "height": 1.2},
+    {"x": 4, "z": -8, "height": 1.2},
+    {"x": -4, "z": -12, "height": 1.2},
+    {"x": 0, "z": -16, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -4, "height": 0.8, "period": 900, "phase": 0},
+    {"x": 2, "z": -8, "height": 0.8, "period": 900, "phase": 225},
+    {"x": -2, "z": -12, "height": 0.8, "period": 900, "phase": 450},
+    {"x": 0, "z": -15, "height": 0.8, "period": 900, "phase": 675}
+  ],
+  "powerUps": [
+    {"x": -2, "z": -2, "type": "speed_boost", "height": 1.5},
+    {"x": 2, "z": -10, "type": "magnet", "height": 1.5},
+    {"x": -2, "z": -14, "type": "shield", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 9",
+  "CELL": 2,
+  "COLS": 9,
+  "ROWS": 18,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "sticky"},
+    {"x": 0, "z": -4, "height": 0.1, "type": "sticky"},
+    {"x": 2, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "sticky"},
+    {"x": 2, "z": -8, "height": 0.1, "type": "sticky"},
+    {"x": 0, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -8, "height": 0.1, "type": "sticky"},
+    {"x": -2, "z": -10, "height": 0.1, "type": "sticky"},
+    {"x": -2, "z": -12, "height": 0.1, "type": "sticky"},
+    {"x": 0, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.1, "type": "ice"},
+    {"x": 2, "z": -14, "height": 0.1, "type": "ice"},
+    {"x": 2, "z": -16, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -4, "height": 1.2},
+    {"x": 2, "z": -8, "height": 1.2},
+    {"x": -2, "z": -12, "height": 1.2},
+    {"x": 2, "z": -16, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -3, "height": 0.8, "period": 1100, "phase": 0},
+    {"x": 2, "z": -7, "height": 0.8, "period": 1100, "phase": 275},
+    {"x": -2, "z": -11, "height": 0.8, "period": 1100, "phase": 550},
+    {"x": 2, "z": -15, "height": 0.8, "period": 1100, "phase": 825}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -4, "type": "speed_boost", "height": 1.5},
+    {"x": 0, "z": -8, "type": "shield", "height": 1.5},
+    {"x": 0, "z": -12, "type": "magnet", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 10",
+  "CELL": 2,
+  "COLS": 11,
+  "ROWS": 22,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -16, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -18, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -18, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -18, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -20, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": -4, "z": -4, "height": 1.2},
+    {"x": 4, "z": -8, "height": 1.2},
+    {"x": -4, "z": -12, "height": 1.2},
+    {"x": 4, "z": -16, "height": 1.2},
+    {"x": 0, "z": -20, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -4, "height": 0.8, "period": 800, "phase": 0},
+    {"x": 2, "z": -8, "height": 0.8, "period": 800, "phase": 160},
+    {"x": -2, "z": -12, "height": 0.8, "period": 800, "phase": 320},
+    {"x": 2, "z": -16, "height": 0.8, "period": 800, "phase": 480}
+  ],
+  "powerUps": [
+    {"x": -2, "z": -2, "type": "speed_boost", "height": 1.5},
+    {"x": 2, "z": -10, "type": "magnet", "height": 1.5},
+    {"x": -2, "z": -14, "type": "shield", "height": 1.5},
+    {"x": 2, "z": -18, "type": "speed_boost", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 11",
+  "CELL": 2,
+  "COLS": 9,
+  "ROWS": 16,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.3, "type": "normal"},
+    {"x": 0, "z": -4, "height": 0.5, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -8, "height": 0.5, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.3, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -14, "height": 0.3, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -4, "height": 1.7},
+    {"x": 2, "z": -8, "height": 1.7},
+    {"x": 2, "z": -12, "height": 1.2},
+    {"x": -2, "z": -14, "height": 1.4}
+  ],
+  "traps": [
+    {"x": 0, "z": -5, "height": 1.2, "period": 1400, "phase": 0},
+    {"x": 2, "z": -9, "height": 1.2, "period": 1400, "phase": 700}
+  ],
+  "powerUps": [
+    {"x": 0, "z": -6, "type": "shield", "height": 1.9},
+    {"x": 0, "z": -12, "type": "magnet", "height": 1.2}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 12",
+  "CELL": 2,
+  "COLS": 11,
+  "ROWS": 18,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.2, "type": "normal"},
+    {"x": 2, "z": -2, "height": 0.2, "type": "normal"},
+    {"x": 2, "z": -4, "height": 0.4, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.6, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.6, "type": "normal"},
+    {"x": -2, "z": -6, "height": 0.6, "type": "normal"},
+    {"x": -2, "z": -8, "height": 0.4, "type": "normal"},
+    {"x": -2, "z": -10, "height": 0.2, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.2, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.2, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.4, "type": "normal"},
+    {"x": 2, "z": -14, "height": 0.6, "type": "normal"},
+    {"x": 0, "z": -14, "height": 0.6, "type": "normal"},
+    {"x": 0, "z": -16, "height": 0.4, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 2, "z": -4, "height": 1.6},
+    {"x": -2, "z": -8, "height": 1.6},
+    {"x": 2, "z": -12, "height": 1.6},
+    {"x": 0, "z": -16, "height": 1.6}
+  ],
+  "traps": [
+    {"x": 0, "z": -4, "height": 1.0, "period": 1300, "phase": 0},
+    {"x": 0, "z": -8, "height": 1.0, "period": 1300, "phase": 325},
+    {"x": 0, "z": -12, "height": 1.0, "period": 1300, "phase": 650},
+    {"x": 2, "z": -14, "height": 1.2, "period": 1300, "phase": 975}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -6, "type": "speed_boost", "height": 1.8},
+    {"x": -2, "z": -10, "type": "shield", "height": 1.4},
+    {"x": 0, "z": -14, "type": "magnet", "height": 1.8}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 13",
+  "CELL": 2,
+  "COLS": 11,
+  "ROWS": 20,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.5, "type": "normal"},
+    {"x": -2, "z": -2, "height": 0.5, "type": "normal"},
+    {"x": -2, "z": -4, "height": 1.0, "type": "normal"},
+    {"x": -2, "z": -6, "height": 1.5, "type": "normal"},
+    {"x": 0, "z": -6, "height": 1.5, "type": "normal"},
+    {"x": 2, "z": -6, "height": 1.5, "type": "normal"},
+    {"x": 2, "z": -8, "height": 1.0, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.5, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.5, "type": "normal"},
+    {"x": -2, "z": -10, "height": 0.5, "type": "normal"},
+    {"x": -2, "z": -12, "height": 1.0, "type": "normal"},
+    {"x": -2, "z": -14, "height": 1.5, "type": "normal"},
+    {"x": 0, "z": -14, "height": 1.5, "type": "normal"},
+    {"x": 2, "z": -14, "height": 1.5, "type": "normal"},
+    {"x": 2, "z": -16, "height": 1.0, "type": "normal"},
+    {"x": 2, "z": -18, "height": 0.5, "type": "normal"},
+    {"x": 0, "z": -18, "height": 0.5, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": -2, "z": -4, "height": 2.2},
+    {"x": 2, "z": -8, "height": 2.2},
+    {"x": -2, "z": -12, "height": 2.2},
+    {"x": 2, "z": -16, "height": 2.2},
+    {"x": 0, "z": -18, "height": 1.7}
+  ],
+  "traps": [
+    {"x": 0, "z": -4, "height": 1.3, "period": 1200, "phase": 0},
+    {"x": 0, "z": -8, "height": 1.3, "period": 1200, "phase": 240},
+    {"x": 0, "z": -12, "height": 1.3, "period": 1200, "phase": 480},
+    {"x": 0, "z": -16, "height": 1.3, "period": 1200, "phase": 720},
+    {"x": 2, "z": -18, "height": 1.0, "period": 1200, "phase": 960}
+  ],
+  "powerUps": [
+    {"x": -2, "z": -2, "type": "shield", "height": 1.7},
+    {"x": 2, "z": -10, "type": "speed_boost", "height": 1.7},
+    {"x": -2, "z": -14, "type": "magnet", "height": 2.7}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 14",
+  "CELL": 2,
+  "COLS": 11,
+  "ROWS": 22,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.3, "type": "normal"},
+    {"x": 2, "z": -2, "height": 0.3, "type": "normal"},
+    {"x": 2, "z": -4, "height": 0.5, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.7, "type": "normal"},
+    {"x": -2, "z": -6, "height": 0.7, "type": "normal"},
+    {"x": -2, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": -2, "z": -10, "height": 1.1, "type": "normal"},
+    {"x": 0, "z": -10, "height": 1.1, "type": "normal"},
+    {"x": 2, "z": -10, "height": 1.1, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.9, "type": "normal"},
+    {"x": 2, "z": -14, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -14, "height": 0.7, "type": "normal"},
+    {"x": -2, "z": -14, "height": 0.7, "type": "normal"},
+    {"x": -2, "z": -16, "height": 0.5, "type": "normal"},
+    {"x": -2, "z": -18, "height": 0.3, "type": "normal"},
+    {"x": 0, "z": -18, "height": 0.3, "type": "normal"},
+    {"x": 2, "z": -18, "height": 0.3, "type": "normal"},
+    {"x": 2, "z": -20, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 2, "z": -4, "height": 1.7},
+    {"x": -2, "z": -8, "height": 2.1},
+    {"x": 2, "z": -12, "height": 2.1},
+    {"x": -2, "z": -16, "height": 1.7},
+    {"x": 2, "z": -20, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -5, "height": 1.2, "period": 1100, "phase": 0},
+    {"x": 0, "z": -9, "height": 1.6, "period": 1100, "phase": 220},
+    {"x": 0, "z": -13, "height": 1.6, "period": 1100, "phase": 440},
+    {"x": 0, "z": -17, "height": 1.2, "period": 1100, "phase": 660},
+    {"x": 0, "z": -19, "height": 0.8, "period": 1100, "phase": 880}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -2, "type": "shield", "height": 1.5},
+    {"x": -2, "z": -10, "type": "speed_boost", "height": 2.3},
+    {"x": 2, "z": -14, "type": "magnet", "height": 1.9},
+    {"x": -2, "z": -18, "type": "shield", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 15",
+  "CELL": 2,
+  "COLS": 13,
+  "ROWS": 24,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.4, "type": "normal"},
+    {"x": 0, "z": -4, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -4, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -6, "height": 1.0, "type": "normal"},
+    {"x": 2, "z": -8, "height": 1.3, "type": "normal"},
+    {"x": 0, "z": -8, "height": 1.3, "type": "normal"},
+    {"x": -2, "z": -8, "height": 1.3, "type": "normal"},
+    {"x": -2, "z": -10, "height": 1.0, "type": "normal"},
+    {"x": -2, "z": -12, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -12, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -14, "height": 1.0, "type": "normal"},
+    {"x": 2, "z": -16, "height": 1.3, "type": "normal"},
+    {"x": 0, "z": -16, "height": 1.3, "type": "normal"},
+    {"x": -2, "z": -16, "height": 1.3, "type": "normal"},
+    {"x": -4, "z": -16, "height": 1.3, "type": "normal"},
+    {"x": -4, "z": -18, "height": 1.0, "type": "normal"},
+    {"x": -4, "z": -20, "height": 0.7, "type": "normal"},
+    {"x": -2, "z": -20, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -20, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -22, "height": 0.4, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -4, "height": 1.9},
+    {"x": 2, "z": -8, "height": 2.5},
+    {"x": -2, "z": -12, "height": 1.9},
+    {"x": 2, "z": -16, "height": 2.5},
+    {"x": -4, "z": -20, "height": 1.9},
+    {"x": 0, "z": -22, "height": 1.6}
+  ],
+  "traps": [
+    {"x": 0, "z": -6, "height": 1.5, "period": 1000, "phase": 0},
+    {"x": 0, "z": -10, "height": 1.5, "period": 1000, "phase": 166},
+    {"x": 0, "z": -14, "height": 1.5, "period": 1000, "phase": 332},
+    {"x": 0, "z": -18, "height": 1.5, "period": 1000, "phase": 498},
+    {"x": 0, "z": -21, "height": 1.2, "period": 1000, "phase": 664},
+    {"x": 2, "z": -22, "height": 1.2, "period": 1000, "phase": 830}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -4, "type": "shield", "height": 1.9},
+    {"x": -2, "z": -8, "type": "speed_boost", "height": 2.5},
+    {"x": 2, "z": -12, "type": "magnet", "height": 1.9},
+    {"x": -4, "z": -16, "type": "shield", "height": 2.5},
+    {"x": -2, "z": -20, "type": "speed_boost", "height": 1.9}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 16",
+  "CELL": 2,
+  "COLS": 11,
+  "ROWS": 20,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "bounce"},
+    {"x": 0, "z": -4, "height": 0.1, "type": "bounce"},
+    {"x": 2, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "bounce"},
+    {"x": 2, "z": -8, "height": 0.1, "type": "bounce"},
+    {"x": 0, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -8, "height": 0.1, "type": "bounce"},
+    {"x": -2, "z": -10, "height": 0.1, "type": "bounce"},
+    {"x": -2, "z": -12, "height": 0.1, "type": "bounce"},
+    {"x": 0, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.1, "type": "bounce"},
+    {"x": 2, "z": -14, "height": 0.1, "type": "bounce"},
+    {"x": 2, "z": -16, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -16, "height": 0.1, "type": "bounce"},
+    {"x": 0, "z": -18, "height": 0.1, "type": "bounce"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -2, "height": 1.2},
+    {"x": 2, "z": -6, "height": 1.2},
+    {"x": -2, "z": -10, "height": 1.2},
+    {"x": 2, "z": -14, "height": 1.2},
+    {"x": 0, "z": -18, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -3, "height": 0.8, "period": 1500, "phase": 0},
+    {"x": 2, "z": -7, "height": 0.8, "period": 1500, "phase": 300},
+    {"x": -2, "z": -11, "height": 0.8, "period": 1500, "phase": 600},
+    {"x": 2, "z": -15, "height": 0.8, "period": 1500, "phase": 900},
+    {"x": 0, "z": -17, "height": 0.8, "period": 1500, "phase": 1200}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -4, "type": "shield", "height": 1.5},
+    {"x": 0, "z": -8, "type": "speed_boost", "height": 1.5},
+    {"x": 0, "z": -12, "type": "magnet", "height": 1.5},
+    {"x": 2, "z": -16, "type": "shield", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 17",
+  "CELL": 2,
+  "COLS": 11,
+  "ROWS": 22,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.1, "type": "conveyor", "direction": "right"},
+    {"x": 2, "z": -2, "height": 0.1, "type": "conveyor", "direction": "left"},
+    {"x": 2, "z": -4, "height": 0.1, "type": "conveyor", "direction": "left"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "conveyor", "direction": "right"},
+    {"x": -2, "z": -6, "height": 0.1, "type": "conveyor", "direction": "right"},
+    {"x": -2, "z": -8, "height": 0.1, "type": "conveyor", "direction": "right"},
+    {"x": -2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.1, "type": "conveyor", "direction": "left"},
+    {"x": 2, "z": -10, "height": 0.1, "type": "conveyor", "direction": "left"},
+    {"x": 2, "z": -12, "height": 0.1, "type": "conveyor", "direction": "left"},
+    {"x": 2, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -14, "height": 0.1, "type": "conveyor", "direction": "right"},
+    {"x": -2, "z": -14, "height": 0.1, "type": "conveyor", "direction": "right"},
+    {"x": -2, "z": -16, "height": 0.1, "type": "conveyor", "direction": "right"},
+    {"x": -2, "z": -18, "height": 0.1, "type": "conveyor", "direction": "right"},
+    {"x": -2, "z": -20, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 2, "z": -4, "height": 1.2},
+    {"x": -2, "z": -8, "height": 1.2},
+    {"x": 2, "z": -12, "height": 1.2},
+    {"x": -2, "z": -16, "height": 1.2},
+    {"x": -2, "z": -20, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 0, "z": -4, "height": 0.8, "period": 1300, "phase": 0},
+    {"x": 0, "z": -8, "height": 0.8, "period": 1300, "phase": 260},
+    {"x": 0, "z": -12, "height": 0.8, "period": 1300, "phase": 520},
+    {"x": 0, "z": -16, "height": 0.8, "period": 1300, "phase": 780},
+    {"x": 0, "z": -19, "height": 0.8, "period": 1300, "phase": 1040}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -6, "type": "shield", "height": 1.5},
+    {"x": -2, "z": -10, "type": "speed_boost", "height": 1.5},
+    {"x": 2, "z": -14, "type": "magnet", "height": 1.5},
+    {"x": -2, "z": -18, "type": "shield", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 18",
+  "CELL": 2,
+  "COLS": 13,
+  "ROWS": 24,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.3, "type": "ice"},
+    {"x": 0, "z": -4, "height": 0.5, "type": "bounce"},
+    {"x": 2, "z": -4, "height": 0.5, "type": "conveyor", "direction": "right"},
+    {"x": 2, "z": -6, "height": 0.7, "type": "sticky"},
+    {"x": 2, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": 0, "z": -8, "height": 0.9, "type": "ice"},
+    {"x": -2, "z": -8, "height": 0.9, "type": "bounce"},
+    {"x": -2, "z": -10, "height": 0.7, "type": "conveyor", "direction": "left"},
+    {"x": -2, "z": -12, "height": 0.5, "type": "sticky"},
+    {"x": 0, "z": -12, "height": 0.5, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.5, "type": "ice"},
+    {"x": 2, "z": -14, "height": 0.7, "type": "bounce"},
+    {"x": 2, "z": -16, "height": 0.9, "type": "conveyor", "direction": "left"},
+    {"x": 0, "z": -16, "height": 0.9, "type": "sticky"},
+    {"x": -2, "z": -16, "height": 0.9, "type": "normal"},
+    {"x": -4, "z": -16, "height": 0.9, "type": "ice"},
+    {"x": -4, "z": -18, "height": 0.7, "type": "bounce"},
+    {"x": -4, "z": -20, "height": 0.5, "type": "conveyor", "direction": "right"},
+    {"x": -2, "z": -20, "height": 0.5, "type": "sticky"},
+    {"x": 0, "z": -20, "height": 0.5, "type": "normal"},
+    {"x": 0, "z": -22, "height": 0.3, "type": "ice"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -4, "height": 1.7},
+    {"x": 2, "z": -8, "height": 2.1},
+    {"x": -2, "z": -12, "height": 1.7},
+    {"x": 2, "z": -16, "height": 2.1},
+    {"x": -4, "z": -20, "height": 1.7},
+    {"x": 0, "z": -22, "height": 1.5}
+  ],
+  "traps": [
+    {"x": 0, "z": -3, "height": 1.0, "period": 1200, "phase": 0},
+    {"x": 0, "z": -7, "height": 1.4, "period": 1200, "phase": 200},
+    {"x": 0, "z": -11, "height": 1.0, "period": 1200, "phase": 400},
+    {"x": 0, "z": -15, "height": 1.4, "period": 1200, "phase": 600},
+    {"x": 0, "z": -19, "height": 1.0, "period": 1200, "phase": 800},
+    {"x": 2, "z": -22, "height": 0.8, "period": 1200, "phase": 1000}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -4, "type": "shield", "height": 1.7},
+    {"x": -2, "z": -8, "type": "speed_boost", "height": 2.1},
+    {"x": 0, "z": -12, "type": "magnet", "height": 1.7},
+    {"x": -2, "z": -16, "type": "shield", "height": 2.1},
+    {"x": -2, "z": -20, "type": "speed_boost", "height": 1.7}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 19",
+  "CELL": 2,
+  "COLS": 13,
+  "ROWS": 24,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": 2, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": 4, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": 4, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": 4, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": 4, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": 2, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": 2, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": 4, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": 6, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": 6, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": 6, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": 6, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": 6, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": 6, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": 4, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": 2, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": 2, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": 4, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": 6, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": 8, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": 8, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": 8, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": 8, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": 8, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": 8, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": 8, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 8, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 6, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 4, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 2, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": 2, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": 4, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": 6, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": 8, "height": 0.1, "type": "normal"},
+    {"x": -8, "z": 10, "height": 0.1, "type": "normal"},
+    {"x": -6, "z": 10, "height": 0.1, "type": "normal"},
+    {"x": -4, "z": 10, "height": 0.1, "type": "normal"},
+    {"x": -2, "z": 10, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": 10, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": 10, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": 10, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": 10, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 10, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 8, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 6, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 4, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 2, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -2, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -4, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -6, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -8, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -10, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 8, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 6, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 4, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 2, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -14, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -16, "height": 0.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 4, "z": -4, "height": 1.2},
+    {"x": -2, "z": 2, "height": 1.2},
+    {"x": 6, "z": -8, "height": 1.2},
+    {"x": -4, "z": 6, "height": 1.2},
+    {"x": 8, "z": -10, "height": 1.2},
+    {"x": -6, "z": 8, "height": 1.2},
+    {"x": 0, "z": -16, "height": 1.2}
+  ],
+  "traps": [
+    {"x": 2, "z": -2, "height": 0.8, "period": 1100, "phase": 0},
+    {"x": -2, "z": 0, "height": 0.8, "period": 1100, "phase": 157},
+    {"x": 4, "z": 2, "height": 0.8, "period": 1100, "phase": 314},
+    {"x": -4, "z": 4, "height": 0.8, "period": 1100, "phase": 471},
+    {"x": 6, "z": -6, "height": 0.8, "period": 1100, "phase": 628},
+    {"x": -6, "z": 6, "height": 0.8, "period": 1100, "phase": 785},
+    {"x": 8, "z": -12, "height": 0.8, "period": 1100, "phase": 942}
+  ],
+  "powerUps": [
+    {"x": 0, "z": -6, "type": "magnet", "height": 1.5},
+    {"x": -2, "z": -8, "type": "shield", "height": 1.5},
+    {"x": 4, "z": 6, "type": "speed_boost", "height": 1.5},
+    {"x": -4, "z": -10, "type": "magnet", "height": 1.5},
+    {"x": 6, "z": 8, "type": "shield", "height": 1.5},
+    {"x": -6, "z": 10, "type": "speed_boost", "height": 1.5}
+  ],
+  "dynamicObstacles": []
+},
+{
+    name: "المرحلة 20 - التحدي النهائي",
+    CELL: 2,
+    COLS: 15,
+    ROWS: 28,
+    tiles: [
+        {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+        {"x": 0, "z": -2, "height": 0.1, "type": "normal"},
+        {"x": 2, "z": -2, "height": 0.1, "type": "ice"},
+        {"x": 2, "z": -4, "height": 0.1, "type": "ice"},
+        {"x": 2, "z": -6, "height": 0.1, "type": "normal"},
+        {"x": 0, "z": -6, "height": 0.1, "type": "normal"},
+        {"x": -2, "z": -6, "height": 0.1, "type": "ice"},
+        {"x": -2, "z": -8, "height": 0.1, "type": "ice"},
+        {"x": -2, "z": -10, "height": 0.1, "type": "normal"},
+        {"x": 0, "z": -10, "height": 0.1, "type": "normal"},
+        {"x": 2, "z": -10, "height": 0.1, "type": "ice"},
+        {"x": 2, "z": -12, "height": 0.1, "type": "ice"},
+        {"x": 2, "z": -14, "height": 0.1, "type": "normal"},
+        {"x": 0, "z": -14, "height": 0.1, "type": "normal"},
+        {"x": -2, "z": -14, "height": 0.1, "type": "ice"},
+        {"x": -4, "z": -14, "height": 0.1, "type": "ice"},
+        {"x": -4, "z": -16, "height": 0.1, "type": "normal"},
+        {"x": -4, "z": -18, "height": 0.1, "type": "normal"},
+        {"x": -2, "z": -18, "height": 0.1, "type": "ice"},
+        {"x": 0, "z": -18, "height": 0.1, "type": "ice"},
+        {"x": 2, "z": -18, "height": 0.1, "type": "normal"},
+        {"x": 4, "z": -18, "height": 0.1, "type": "normal"},
+        {"x": 4, "z": -20, "height": 0.1, "type": "ice"},
+        {"x": 4, "z": -22, "height": 0.1, "type": "ice"},
+        {"x": 2, "z": -22, "height": 0.1, "type": "normal"},
+        {"x": 0, "z": -22, "height": 0.1, "type": "normal"},
+        {"x": 0, "z": -24, "height": 0.1, "type": "ice"},
+        {"x": 0, "z": -26, "height": 0.1, "type": "normal"}
+    ],
+    crystals: [
+        {"x": 2, "z": -2, "height": 1.5},
+        {"x": 0, "z": -6, "height": 1.5},
+        {"x": -2, "z": -10, "height": 1.5},
+        {"x": 2, "z": -14, "height": 1.5},
+        {"x": -4, "z": -18, "height": 1.5},
+        {"x": 4, "z": -22, "height": 1.5},
+        {"x": 0, "z": -26, "height": 1.5}
+    ],
+    traps: [
+        {"x": 0, "z": -4, "height": 0.8, "period": 2000, "phase": 0},
+        {"x": -2, "z": -8, "height": 0.8, "period": 1800, "phase": 500},
+        {"x": 2, "z": -12, "height": 0.8, "period": 1600, "phase": 1000},
+        {"x": -2, "z": -16, "height": 0.8, "period": 1400, "phase": 1500},
+        {"x": 0, "z": -20, "height": 0.8, "period": 1200, "phase": 2000}
+    ],
+    powerUps: [
+        {"x": 2, "z": -6, "height": 1.2, "type": "shield"},
+        {"x": -2, "z": -14, "height": 1.2, "type": "magnet"},
+        {"x": 4, "z": -18, "height": 1.2, "type": "speed_boost"}
+    ],
+    dynamicObstacles: [
+        {
+            type: "rotating_blade",
+            x: 0,
+            z: -12,
+            height: 1.8,
+            rotationSpeed: 3
+        },
+        {
+            type: "rotating_blade", 
+            x: 0,
+            z: -18,
+            height: 1.8,
+            rotationSpeed: 2.5
+        }
+    ]
+},
+{
+  "name": "المرحلة 21",
+  "CELL": 2,
+  "COLS": 11,
+  "ROWS": 32,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.4, "type": "normal"},
+    {"x": 0, "z": -4, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -6, "height": 1.0, "type": "normal"},
+    {"x": 0, "z": -8, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -10, "height": 0.4, "type": "normal"},
+    {"x": 0, "z": -12, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -14, "height": 0.4, "type": "normal"},
+    {"x": 0, "z": -16, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -18, "height": 1.0, "type": "normal"},
+    {"x": 0, "z": -20, "height": 1.3, "type": "normal"},
+    {"x": 0, "z": -22, "height": 1.0, "type": "normal"},
+    {"x": 0, "z": -24, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -26, "height": 0.4, "type": "normal"},
+    {"x": 0, "z": -28, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -30, "height": 0.4, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -4, "height": 1.9},
+    {"x": 0, "z": -10, "height": 1.6},
+    {"x": 0, "z": -16, "height": 1.9},
+    {"x": 0, "z": -22, "height": 2.3},
+    {"x": 0, "z": -28, "height": 1.6},
+    {"x": 0, "z": -30, "height": 1.6}
+  ],
+  "traps": [
+    {"x": 0, "z": -5, "height": 1.3, "period": 1700, "phase": 0},
+    {"x": 0, "z": -11, "height": 1.0, "period": 1700, "phase": 183},
+    {"x": 0, "z": -17, "height": 1.3, "period": 1700, "phase": 366},
+    {"x": 0, "z": -23, "height": 1.6, "period": 1700, "phase": 549},
+    {"x": 0, "z": -29, "height": 1.0, "period": 1700, "phase": 732}
+  ],
+  "powerUps": [
+    {"x": 0, "z": -6, "type": "speed_boost", "height": 2.2},
+    {"x": 0, "z": -12, "type": "magnet", "height": 1.3},
+    {"x": 0, "z": -18, "type": "shield", "height": 2.2},
+    {"x": 0, "z": -24, "type": "speed_boost", "height": 2.5},
+    {"x": 0, "z": -30, "type": "magnet", "height": 1.6}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 22",
+  "CELL": 2,
+  "COLS": 11,
+  "ROWS": 34,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.3, "type": "normal"},
+    {"x": 0, "z": -4, "height": 0.5, "type": "normal"},
+    {"x": 2, "z": -4, "height": 0.5, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": 2, "z": -10, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -12, "height": 0.5, "type": "normal"},
+    {"x": 0, "z": -12, "height": 0.5, "type": "normal"},
+    {"x": -2, "z": -12, "height": 0.5, "type": "normal"},
+    {"x": -2, "z": -14, "height": 0.7, "type": "normal"},
+    {"x": -2, "z": -16, "height": 0.9, "type": "normal"},
+    {"x": -2, "z": -18, "height": 1.1, "type": "normal"},
+    {"x": -2, "z": -20, "height": 0.9, "type": "normal"},
+    {"x": -2, "z": -22, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -22, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -22, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -24, "height": 0.9, "type": "normal"},
+    {"x": 2, "z": -26, "height": 1.1, "type": "normal"},
+    {"x": 2, "z": -28, "height": 1.3, "type": "normal"},
+    {"x": 2, "z": -30, "height": 1.1, "type": "normal"},
+    {"x": 2, "z": -32, "height": 0.9, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -4, "height": 1.7},
+    {"x": 2, "z": -8, "height": 2.1},
+    {"x": -2, "z": -16, "height": 2.1},
+    {"x": -2, "z": -20, "height": 2.3},
+    {"x": 2, "z": -26, "height": 2.3},
+    {"x": 2, "z": -30, "height": 2.3},
+    {"x": 2, "z": -32, "height": 2.1}
+  ],
+  "traps": [
+    {"x": 0, "z": -6, "height": 1.2, "period": 1000, "phase": 0},
+    {"x": 0, "z": -14, "height": 1.4, "period": 1000, "phase": 166},
+    {"x": 0, "z": -18, "height": 1.6, "period": 1000, "phase": 332},
+    {"x": 0, "z": -24, "height": 1.6, "period": 1000, "phase": 498},
+    {"x": 0, "z": -28, "height": 1.8, "period": 1000, "phase": 664},
+    {"x": 0, "z": -31, "height": 1.6, "period": 1000, "phase": 830}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -4, "type": "shield", "height": 1.7},
+    {"x": -2, "z": -12, "type": "speed_boost", "height": 1.7},
+    {"x": 0, "z": -22, "type": "magnet", "height": 1.9},
+    {"x": 2, "z": -28, "type": "shield", "height": 2.5},
+    {"x": 2, "z": -32, "type": "speed_boost", "height": 2.1}
+  ],
+  "dynamicObstacles": []
+},
+{
+  "name": "المرحلة 23",
+  "CELL": 2,
+  "COLS": 9,
+  "ROWS": 25,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.3, "type": "normal"},
+    {"x": 2, "z": -2, "height": 0.3, "type": "normal"},
+    {"x": 2, "z": -4, "height": 0.5, "type": "normal"},
+    {"x": 4, "z": -4, "height": 0.5, "type": "normal"},
+    {"x": 4, "z": -6, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -6, "height": 0.7, "type": "normal"},
+    {"x": 2, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": 0, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": 0, "z": -10, "height": 1.1, "type": "normal"},
+    {"x": -2, "z": -10, "height": 1.1, "type": "normal"},
+    {"x": -2, "z": -12, "height": 1.3, "type": "normal"},
+    {"x": -4, "z": -12, "height": 1.3, "type": "normal"},
+    {"x": -4, "z": -14, "height": 1.5, "type": "normal"},
+    {"x": -2, "z": -14, "height": 1.5, "type": "normal"},
+    {"x": -2, "z": -16, "height": 1.7, "type": "normal"},
+    {"x": 0, "z": -16, "height": 1.7, "type": "normal"},
+    {"x": 0, "z": -18, "height": 1.9, "type": "normal"},
+    {"x": 2, "z": -18, "height": 1.9, "type": "normal"},
+    {"x": 2, "z": -20, "height": 2.1, "type": "normal"},
+    {"x": 4, "z": -20, "height": 2.1, "type": "normal"},
+    {"x": 4, "z": -22, "height": 2.3, "type": "normal"},
+    {"x": 2, "z": -22, "height": 2.3, "type": "normal"},
+    {"x": 2, "z": -24, "height": 2.5, "type": "normal"},
+    {"x": 0, "z": -24, "height": 2.5, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -2, "height": 1.6},
+    {"x": 2, "z": -4, "height": 1.8},
+    {"x": 4, "z": -6, "height": 2.0},
+    {"x": 2, "z": -8, "height": 2.2},
+    {"x": 0, "z": -10, "height": 2.4},
+    {"x": -2, "z": -12, "height": 2.6},
+    {"x": -4, "z": -14, "height": 2.8},
+    {"x": -2, "z": -16, "height": 3.0},
+    {"x": 0, "z": -18, "height": 3.2},
+    {"x": 2, "z": -20, "height": 3.4},
+    {"x": 4, "z": -22, "height": 3.6},
+    {"x": 2, "z": -24, "height": 3.8}
+  ],
+  "traps": [
+    {"x": 2, "z": -3, "height": 1.0, "period": 2000, "phase": 0},
+    {"x": 4, "z": -7, "height": 1.2, "period": 1800, "phase": 500},
+    {"x": 0, "z": -11, "height": 1.6, "period": 2200, "phase": 1000},
+    {"x": -4, "z": -15, "height": 2.0, "period": 1900, "phase": 1500},
+    {"x": 2, "z": -19, "height": 2.4, "period": 2100, "phase": 2000},
+    {"x": 4, "z": -23, "height": 2.8, "period": 1700, "phase": 2500}
+  ],
+  "powerUps": [
+    {"x": 0, "z": -8, "height": 2.2, "type": "shield"},
+    {"x": -2, "z": -14, "height": 2.8, "type": "magnet"}
+  ],
+  "dynamicObstacles": [
+    {
+      "type": "rotating_blade",
+      "x": 0,
+      "z": -6,
+      "height": 1.4,
+      "rotationSpeed": 4
+    },
+    {
+      "type": "rotating_blade",
+      "x": -2,
+      "z": -18,
+      "height": 2.2,
+      "rotationSpeed": 5
+    },
+    {
+      "type": "rotating_blade",
+      "x": 4,
+      "z": -26,
+      "height": 3.0,
+      "rotationSpeed": 6
+    }
+  ]
+},
+{
+  "name": "المرحلة 24",
+  "CELL": 2,
+  "COLS": 7,
+  "ROWS": 28,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.3, "type": "normal"},
+    {"x": 0, "z": -4, "height": 0.5, "type": "normal"},
+    {"x": 2, "z": -4, "height": 0.5, "type": "normal"},
+    {"x": 4, "z": -4, "height": 0.5, "type": "normal"},
+    {"x": 4, "z": -6, "height": 0.7, "type": "normal"},
+    {"x": 4, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": 2, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": 0, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": -2, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": -4, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": -4, "z": -10, "height": 1.1, "type": "normal"},
+    {"x": -4, "z": -12, "height": 1.3, "type": "normal"},
+    {"x": -2, "z": -12, "height": 1.3, "type": "normal"},
+    {"x": 0, "z": -12, "height": 1.3, "type": "normal"},
+    {"x": 2, "z": -12, "height": 1.3, "type": "normal"},
+    {"x": 4, "z": -12, "height": 1.3, "type": "normal"},
+    {"x": 4, "z": -14, "height": 1.5, "type": "normal"},
+    {"x": 4, "z": -16, "height": 1.7, "type": "normal"},
+    {"x": 2, "z": -16, "height": 1.7, "type": "normal"},
+    {"x": 0, "z": -16, "height": 1.7, "type": "normal"},
+    {"x": 0, "z": -18, "height": 1.9, "type": "normal"},
+    {"x": 0, "z": -20, "height": 2.1, "type": "normal"},
+    {"x": 0, "z": -22, "height": 2.3, "type": "normal"},
+    {"x": 0, "z": -24, "height": 2.5, "type": "normal"},
+    {"x": 0, "z": -26, "height": 2.7, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -2, "height": 1.6},
+    {"x": 0, "z": -4, "height": 1.8},
+    {"x": 4, "z": -6, "height": 2.0},
+    {"x": 4, "z": -8, "height": 2.2},
+    {"x": -4, "z": -10, "height": 2.4},
+    {"x": -4, "z": -12, "height": 2.6},
+    {"x": 4, "z": -14, "height": 2.8},
+    {"x": 4, "z": -16, "height": 3.0},
+    {"x": 0, "z": -18, "height": 3.2},
+    {"x": 0, "z": -20, "height": 3.4},
+    {"x": 0, "z": -22, "height": 3.6},
+    {"x": 0, "z": -24, "height": 3.8},
+    {"x": 0, "z": -26, "height": 4.0}
+  ],
+  "traps": [
+    {"x": 0, "z": -2, "height": 1.0, "period": 1500, "phase": 0},
+    {"x": 4, "z": -6, "height": 1.2, "period": 1600, "phase": 300},
+    {"x": -4, "z": -10, "height": 1.6, "period": 1700, "phase": 600},
+    {"x": 4, "z": -14, "height": 2.0, "period": 1800, "phase": 900},
+    {"x": 0, "z": -18, "height": 2.4, "period": 1900, "phase": 1200},
+    {"x": 0, "z": -22, "height": 2.8, "period": 2000, "phase": 1500}
+  ],
+  "powerUps": [
+    {"x": 2, "z": -8, "height": 2.2, "type": "speed_boost"},
+    {"x": -2, "z": -12, "height": 2.6, "type": "shield"},
+    {"x": 2, "z": -16, "height": 3.0, "type": "magnet"}
+  ],
+  "dynamicObstacles": [
+    {
+      "type": "rotating_blade",
+      "x": 0,
+      "z": -6,
+      "height": 1.4,
+      "rotationSpeed": 4
+    },
+    {
+      "type": "rotating_blade",
+      "x": 0,
+      "z": -12,
+      "height": 2.0,
+      "rotationSpeed": 5
+    }
+  ]
+},
+{
+  "name": "المرحلة 25",
+  "CELL": 2,
+  "COLS": 7,
+  "ROWS": 40,
+  "tiles": [
+    {"x": 0, "z": 0, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -2, "height": 0.3, "type": "normal"},
+    {"x": 0, "z": -4, "height": 0.5, "type": "normal"},
+    {"x": 0, "z": -6, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -8, "height": 0.9, "type": "normal"},
+    {"x": 0, "z": -10, "height": 1.1, "type": "normal"},
+    {"x": 0, "z": -12, "height": 1.3, "type": "normal"},
+    {"x": 0, "z": -14, "height": 1.5, "type": "normal"},
+    {"x": 0, "z": -16, "height": 1.7, "type": "normal"},
+    {"x": 0, "z": -18, "height": 1.9, "type": "normal"},
+    {"x": 0, "z": -20, "height": 2.1, "type": "normal"},
+    {"x": 0, "z": -22, "height": 1.9, "type": "normal"},
+    {"x": 0, "z": -24, "height": 1.7, "type": "normal"},
+    {"x": 0, "z": -26, "height": 1.5, "type": "normal"},
+    {"x": 0, "z": -28, "height": 1.3, "type": "normal"},
+    {"x": 0, "z": -30, "height": 1.1, "type": "normal"},
+    {"x": 0, "z": -32, "height": 0.9, "type": "normal"},
+    {"x": 0, "z": -34, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -36, "height": 0.5, "type": "normal"},
+    {"x": 0, "z": -38, "height": 0.3, "type": "normal"},
+    {"x": 0, "z": -40, "height": 0.1, "type": "normal"},
+    {"x": 0, "z": -42, "height": 0.3, "type": "normal"},
+    {"x": 0, "z": -44, "height": 0.5, "type": "normal"},
+    {"x": 0, "z": -46, "height": 0.7, "type": "normal"},
+    {"x": 0, "z": -48, "height": 0.9, "type": "normal"},
+    {"x": 0, "z": -50, "height": 1.1, "type": "normal"},
+    {"x": 0, "z": -52, "height": 1.3, "type": "normal"},
+    {"x": 0, "z": -54, "height": 1.5, "type": "normal"},
+    {"x": 0, "z": -56, "height": 1.7, "type": "normal"},
+    {"x": 0, "z": -58, "height": 1.9, "type": "normal"},
+    {"x": 0, "z": -60, "height": 2.1, "type": "normal"},
+    {"x": 0, "z": -62, "height": 2.3, "type": "normal"},
+    {"x": 0, "z": -64, "height": 2.5, "type": "normal"},
+    {"x": 0, "z": -66, "height": 2.7, "type": "normal"},
+    {"x": 0, "z": -68, "height": 2.9, "type": "normal"},
+    {"x": 0, "z": -70, "height": 3.1, "type": "normal"}
+  ],
+  "crystals": [
+    {"x": 0, "z": -2, "height": 1.6},
+    {"x": 0, "z": -6, "height": 2.0},
+    {"x": 0, "z": -10, "height": 2.4},
+    {"x": 0, "z": -14, "height": 2.8},
+    {"x": 0, "z": -18, "height": 3.2},
+    {"x": 0, "z": -22, "height": 3.2},
+    {"x": 0, "z": -26, "height": 2.8},
+    {"x": 0, "z": -30, "height": 2.4},
+    {"x": 0, "z": -34, "height": 2.0},
+    {"x": 0, "z": -38, "height": 1.6},
+    {"x": 0, "z": -42, "height": 1.6},
+    {"x": 0, "z": -46, "height": 2.0},
+    {"x": 0, "z": -50, "height": 2.4},
+    {"x": 0, "z": -54, "height": 2.8},
+    {"x": 0, "z": -58, "height": 3.2},
+    {"x": 0, "z": -62, "height": 3.6},
+    {"x": 0, "z": -66, "height": 4.0},
+    {"x": 0, "z": -70, "height": 4.4}
+  ],
+  "traps": [
+    {"x": 0, "z": -4, "height": 1.2, "period": 1700, "phase": 0},
+    {"x": 0, "z": -12, "height": 1.8, "period": 1700, "phase": 200},
+    {"x": 0, "z": -20, "height": 2.4, "period": 1700, "phase": 400},
+    {"x": 0, "z": -28, "height": 1.6, "period": 1700, "phase": 600},
+    {"x": 0, "z": -36, "height": 1.0, "period": 1700, "phase": 800},
+    {"x": 0, "z": -44, "height": 1.4, "period": 1700, "phase": 1000},
+    {"x": 0, "z": -52, "height": 2.0, "period": 1800, "phase": 1200},
+    {"x": 0, "z": -60, "height": 2.8, "period": 1900, "phase": 1400},
+    {"x": 0, "z": -68, "height": 3.6, "period": 2000, "phase": 1600}
+  ],
+  "powerUps": [
+    {"x": 0, "z": -8, "height": 2.2, "type": "shield"},
+    {"x": 0, "z": -24, "height": 2.2, "type": "magnet"},
+    {"x": 0, "z": -40, "height": 1.4, "type": "speed_boost"},
+    {"x": 0, "z": -56, "height": 3.0, "type": "shield"},
+    {"x": 0, "z": -64, "height": 3.8, "type": "magnet"}
+  ],
+  "dynamicObstacles": [
+    {
+      "type": "rotating_blade",
+      "x": 2,
+      "z": -16,
+      "height": 2.4,
+      "rotationSpeed": 6
+    },
+    {
+      "type": "rotating_blade",
+      "x": -2,
+      "z": -32,
+      "height": 1.8,
+      "rotationSpeed": 7
+    },
+    {
+      "type": "rotating_blade",
+      "x": 2,
+      "z": -48,
+      "height": 1.6,
+      "rotationSpeed": 8
+    },
+    {
+      "type": "rotating_blade",
+      "x": -2,
+      "z": -58,
+      "height": 3.2,
+      "rotationSpeed": 6
+    },
+    {
+      "type": "rotating_blade",
+      "x": 2,
+      "z": -66,
+      "height": 3.8,
+      "rotationSpeed": 7
+    }
+  ]
+}
+];
+
+// دالة تحميل المراحل المضمنة
+async function loadGameData() {
+    console.log("🔄 تحميل المراحل المضمنة...");
+    return embeddedStages;
+}
+
+// نظام الجسيمات الأساسي
+function createParticle(type, position, color = 0xffffff) {
+    const particle = {
+        mesh: null,
+        velocity: new THREE.Vector3(
+            (Math.random() - 0.5) * 4,
+            Math.random() * 3 + 2,
+            (Math.random() - 0.5) * 4
+        ),
+        life: 1.0,
+        maxLife: 1.0,
+        type: type
+    };
+
+    let geometry, material;
+    switch (type) {
+        case 'sparkle':
+            geometry = new THREE.SphereGeometry(0.1, 8, 6);
+            material = new THREE.MeshBasicMaterial({color: color, transparent: true});
+            break;
+        case 'glow':
+            geometry = new THREE.SphereGeometry(0.15, 12, 8);
+            material = new THREE.MeshBasicMaterial({color: color, transparent: true});
+            break;
+        case 'trail':
+            geometry = new THREE.SphereGeometry(0.05, 6, 4);
+            material = new THREE.MeshBasicMaterial({color: color, transparent: true});
+            break;
+    }
+
+    particle.mesh = new THREE.Mesh(geometry, material);
+    particle.mesh.position.copy(position);
+    scene.add(particle.mesh);
+    activeParticles.push(particle);
+}
+
+// نظام الجسيمات المتقدم
+function createAdvancedParticle(type, position, color = 0xffffff) {
+const particle = {
+    mesh: null,
+    velocity: new THREE.Vector3(),
+    life: 1.0,
+    maxLife: 1.0,
+    type: type,
+    size: 1.0
+};
+
+let geometry, material;
+
+switch (type) {
+    case 'shield':
+        geometry = new THREE.RingGeometry(0.8, 1.0, 32);
+        material = new THREE.MeshBasicMaterial({ 
+            color: color, 
+            transparent: true, 
+            side: THREE.DoubleSide,
+            opacity: 0.6
+        });
+        particle.velocity.y = 0.5;
+        particle.life = 2.0;
+        particle.maxLife = 2.0;
+        break;
+    case 'shield_sparkle':
+        geometry = new THREE.SphereGeometry(0.05, 8, 6);
+        material = new THREE.MeshBasicMaterial({color: color, transparent: true});
+        particle.velocity.set(
+            (Math.random() - 0.5) * 3,
+            Math.random() * 2,
+            (Math.random() - 0.5) * 3
+        );
+        break;
+    case 'magnet_field':
+        geometry = new THREE.RingGeometry(1.5, 2.0, 32);
+        material = new THREE.MeshBasicMaterial({ 
+            color: color, 
+            transparent: true, 
+            side: THREE.DoubleSide,
+            opacity: 0.4
+        });
+        particle.life = 1.5;
+        particle.maxLife = 1.5;
+        break;
+    case 'speed_trail':
+        geometry = new THREE.SphereGeometry(0.2, 12, 8);
+        material = new THREE.MeshBasicMaterial({color: color, transparent: true});
+        particle.velocity.copy(ball.userData.velocity.clone().multiplyScalar(-0.1));
+        particle.life = 0.5;
+        particle.maxLife = 0.5;
+        break;
+    case 'effect_trail':
+        geometry = new THREE.SphereGeometry(0.1, 6, 4);
+        material = new THREE.MeshBasicMaterial({color: color, transparent: true});
+        particle.velocity.set(
+            (Math.random() - 0.5) * 2,
+            Math.random() * 1,
+            (Math.random() - 0.5) * 2
+        );
+        particle.life = 1.0;
+        particle.maxLife = 1.0;
+        break;
+    case 'coin':
+        geometry = new THREE.CircleGeometry(0.2, 16);
+        material = new THREE.MeshBasicMaterial({ 
+            color: color, 
+            transparent: true,
+            side: THREE.DoubleSide
+        });
+        particle.velocity.set(
+            (Math.random() - 0.5) * 2,
+            Math.random() * 3 + 2,
+            (Math.random() - 0.5) * 2
+        );
+        particle.life = 1.5;
+        particle.maxLife = 1.5;
+        break;
+    case 'disco_glow':
+        geometry = new THREE.SphereGeometry(0.15, 12, 8);
+        material = new THREE.MeshBasicMaterial({color: color, transparent: true});
+        particle.velocity.set(
+            (Math.random() - 0.5) * 1,
+            Math.random() * 0.5,
+            (Math.random() - 0.5) * 1
+        );
+        particle.life = 0.8;
+        particle.maxLife = 0.8;
+        break;
+    case 'smoke':
+        geometry = new THREE.SphereGeometry(0.2, 8, 6);
+        material = new THREE.MeshBasicMaterial({ 
+            color: color, 
+            transparent: true,
+            opacity: 0.4
+        });
+        particle.velocity.set(
+            (Math.random() - 0.5) * 1,
+            Math.random() * 2 + 1,
+            (Math.random() - 0.5) * 1
+        );
+        particle.life = 2.0;
+        particle.maxLife = 2.0;
+        break;
+    case 'energy_spark':
+        geometry = new THREE.SphereGeometry(0.08, 6, 4);
+        material = new THREE.MeshBasicMaterial({color: color, transparent: true});
+        particle.velocity.set(
+            (Math.random() - 0.5) * 3,
+            Math.random() * 2,
+            (Math.random() - 0.5) * 3
+        );
+        particle.life = 0.7;
+        particle.maxLife = 0.7;
+        break;
+}
+
+if (geometry && material) {
+    particle.mesh = new THREE.Mesh(geometry, material);
+    particle.mesh.position.copy(position);
+    scene.add(particle.mesh);
+    advancedParticles.push(particle);
+}
+}
+
+function updateParticles(dt) {
+for (let i = activeParticles.length - 1; i >= 0; i--) {
+    const p = activeParticles[i];
+    p.life -= dt;
+    
+    if (p.life <= 0) {
+        scene.remove(p.mesh);
+        activeParticles.splice(i, 1);
+        continue;
+    }
+
+    p.mesh.material.opacity = p.life;
+    p.mesh.position.addScaledVector(p.velocity, dt);
+    p.velocity.y -= 8 * dt;
+    
+    if (p.type === 'sparkle') {
+        p.mesh.scale.setScalar(p.life);
+    }
+}
+
+for (let i = advancedParticles.length - 1; i >= 0; i--) {
+    const p = advancedParticles[i];
+    p.life -= dt;
+    
+    if (p.life <= 0) {
+        scene.remove(p.mesh);
+        advancedParticles.splice(i, 1);
+        continue;
+    }
+
+    p.mesh.material.opacity = p.life;
+    p.mesh.position.addScaledVector(p.velocity, dt);
+    
+    if (p.type.includes('shield') || p.type.includes('magnet')) {
+        p.mesh.rotation.y += dt * 2;
+        p.mesh.scale.setScalar(p.life * 0.5 + 0.5);
+    }
+    
+    if (p.type === 'smoke') {
+        p.mesh.scale.setScalar(1 + (1 - p.life) * 2);
+    }
+}
+
+activeEffectsEl.textContent = activeParticles.length + advancedParticles.length;
+effectsCounter.style.display = (activeParticles.length + advancedParticles.length) > 0 ? 'block' : 'none';
+}
+
+// نظام الطاقة والقدرات
+function activatePowerUp(powerUpType) {
+const existingIndex = activePowerUps.findIndex(p => p.type.id === powerUpType.id);
+if (existingIndex > -1) {
+    activePowerUps[existingIndex].timeLeft = powerUpType.duration;
+} else {
+    activePowerUps.push({
+        type: powerUpType,
+        timeLeft: powerUpType.duration
+    });
+    powerUpType.effect(ball);
+}
+updatePowerUpIndicator();
+}
+
+function updatePowerUps(dt) {
+for (let i = activePowerUps.length - 1; i >= 0; i--) {
+    const powerUp = activePowerUps[i];
+    powerUp.timeLeft -= dt;
+    
+    if (powerUp.timeLeft <= 0) {
+        powerUp.type.end(ball);
+        activePowerUps.splice(i, 1);
+    } else {
+        powerUp.type.update(ball, dt);
+    }
+}
+updatePowerUpIndicator();
+}
+
+function updatePowerUpIndicator() {
+powerupIndicator.innerHTML = '';
+activePowerUps.forEach(powerUp => {
+    const icon = document.createElement('div');
+    icon.className = 'powerup-icon active';
+    icon.innerHTML = powerUp.type.icon;
+    icon.style.background = `rgba(${parseInt(powerUp.type.color.toString(16).substring(0,2), 16)}, ${parseInt(powerUp.type.color.toString(16).substring(2,4), 16)}, ${parseInt(powerUp.type.color.toString(16).substring(4,6), 16)}, 0.3)`;
+    icon.title = `${powerUp.type.name} (${Math.ceil(powerUp.timeLeft)}s)`;
+    powerupIndicator.appendChild(icon);
+});
+}
+
+// العقبات الديناميكية
+function updateDynamicObstacles(dt) {
+dynamicObstacles.forEach(obstacle => {
+    const userData = obstacle.userData;
+    
+    switch (userData.type) {
+        case 'moving_platform':
+            const targetPos = userData.direction > 0 ? userData.endPos : userData.startPos;
+            const currentPos = obstacle.position;
+            const direction = new THREE.Vector3().subVectors(targetPos, currentPos).normalize();
+            
+            obstacle.position.addScaledVector(direction, dt * userData.speed);
+            
+            if (currentPos.distanceTo(targetPos) < 0.1) {
+                userData.direction *= -1;
+            }
+            break;
+            
+        case 'rotating_blade':
+            obstacle.rotation.y += dt * userData.rotationSpeed;
+            break;
+            
+        case 'falling_platform':
+            if (userData.falling) {
+                userData.fallTimer += dt;
+                if (userData.fallTimer >= userData.fallDelay) {
+                    obstacle.position.y -= dt * userData.fallSpeed;
+                    
+                    if (obstacle.position.y < -10) {
+                        obstacle.position.y = userData.originalY;
+                        userData.falling = false;
+                        userData.fallTimer = 0;
+                        obstacle.material.emissive.setHex(0xaa6622);
+                    }
+                }
+            }
+            break;
+    }
+});
+}
+
+// نظام التصادم المحسن مع المنصات
+function checkPlatformCollisions() {
+if (!ball) return null;
+
+let closestPlatform = null;
+let closestDistance = Infinity;
+const ballRadius = ball.userData.radius;
+
+for (let platform of dynamicObstacles) {
+    if (!platform.userData.platform) continue;
+    
+    const platformData = platform.userData;
+    const platformCenter = platform.position.clone();
+    
+    const platformBounds = {
+        minX: platformCenter.x - platformData.width / 2,
+        maxX: platformCenter.x + platformData.width / 2,
+        minZ: platformCenter.z - platformData.depth / 2,
+        maxZ: platformCenter.z + platformData.depth / 2,
+        top: platformCenter.y + platformData.height / 2
+    };
+    
+    const horizontalCollision = 
+        ball.position.x + ballRadius > platformBounds.minX &&
+        ball.position.x - ballRadius < platformBounds.maxX &&
+        ball.position.z + ballRadius > platformBounds.minZ &&
+        ball.position.z - ballRadius < platformBounds.maxZ;
+    
+    if (horizontalCollision) {
+        const ballBottom = ball.position.y - ballRadius;
+        const platformTop = platformBounds.top;
+        const verticalDistance = ballBottom - platformTop;
+        
+        if (verticalDistance <= 0.3 && verticalDistance >= -0.5) {
+            const distance = Math.abs(verticalDistance);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestPlatform = platform;
+            }
+        }
+    }
+}
+
+return closestPlatform;
+}
+
+// نظام التصادم مع البلاطات
+function checkCollisions() {
+if (!ball) return null;
+
+let closestTile = null;
+let closestDistance = Infinity;
+const ballRadius = ball.userData.radius;
+
+for (let tile of tiles) {
+    const dx = Math.abs(ball.position.x - tile.position.x);
+    const dz = Math.abs(ball.position.z - tile.position.z);
+    
+    if (dx < (tile.userData.width / 2 + ballRadius * 0.8) && 
+        dz < (tile.userData.depth / 2 + ballRadius * 0.8)) {
+        
+        const tileTop = tile.position.y + 0.1;
+        const ballBottom = ball.position.y - ballRadius;
+        const verticalDistance = ballBottom - tileTop;
+        
+        if (verticalDistance <= 0.3 && verticalDistance >= -1) {
+            const distance = Math.sqrt(dx * dx + dz * dz + verticalDistance * verticalDistance);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestTile = tile;
+            }
+        }
+    }
+}
+
+return closestTile;
+}
+
+// نظام الفيزياء المحسن
+function applyPhysics(dt) {
+if (!ball) return;
+
+const collidedTile = checkCollisions();
+const collidedPlatform = checkPlatformCollisions();
+
+const collidedObject = collidedTile || collidedPlatform;
+
+if (collidedObject) {
+    ball.userData.onGround = true;
+    
+    let groundHeight;
+    if (collidedObject.userData.platform) {
+        groundHeight = collidedObject.position.y + collidedObject.userData.height / 2 + ball.userData.radius;
+    } else {
+        groundHeight = collidedObject.position.y + 0.1 + ball.userData.radius;
+    }
+    
+    ball.userData.groundY = groundHeight;
+    
+    if (ball.position.y < groundHeight) {
+        ball.position.y = groundHeight;
+    }
+    
+    ball.userData.velocity.y = Math.max(0, ball.userData.velocity.y);
+    
+    const objectData = collidedObject.userData;
+    
+    if (objectData.type === 'conveyor' && objectData.direction) {
+        const baseSpeed = objectData.speed || 2.0;
+        const speed = baseSpeed * dt;
+        if (objectData.direction === 'left') ball.userData.velocity.x -= speed;
+        else if (objectData.direction === 'right') ball.userData.velocity.x += speed;
+    }
+    
+    if (objectData.bounce && ball.userData.velocity.y < -1) {
+        ball.userData.velocity.y *= -objectData.bounce;
+        createAdvancedParticle('sparkle', ball.position, 0xffaa44);
+    }
+    
+    ball.userData.velocity.x *= objectData.friction;
+    ball.userData.velocity.z *= objectData.friction;
+    
+    if (objectData.type === 'ice' && Math.random() < 0.1) {
+        createAdvancedParticle('trail', ball.position, 0x88ccff);
+    }
+    
+    if (objectData.type === 'falling_platform' && !objectData.falling) {
+        objectData.falling = true;
+        objectData.fallTimer = 0;
+        collidedObject.material.emissive.setHex(0xff0000);
+        createAdvancedParticle('crack', collidedObject.position, 0xffaa44);
+    }
+    
+} else {
+    ball.userData.onGround = false;
+    ball.userData.velocity.y += GRAVITY * dt * playerCustomization.gravityEffect;
+    ball.position.y += ball.userData.velocity.y * dt;
+    
+    if (Math.random() < 0.3) {
+        createAdvancedParticle('trail', ball.position, 0x8844ff);
+    }
+    
+    if (ball.position.y < -10) resetBall();
+}
+
+if (ball.userData.speedBoost && ball.userData.speedBoost !== 1.0) {
+    ball.userData.velocity.multiplyScalar(ball.userData.speedBoost);
+    ball.userData.speedBoost = 1.0;
+}
+}
+
+// نظام التصادم مع العقبات الخطرة
+function checkHazardCollisions() {
+if (!ball || ball.userData.shielded) return false;
+
+for (let obstacle of dynamicObstacles) {
+    if (obstacle.userData.platform) continue;
+    
+    const distance = obstacle.position.distanceTo(ball.position);
+    let collisionDistance = 1.0;
+    
+    switch (obstacle.userData.type) {
+        case 'rotating_blade':
+            collisionDistance = 0.8;
+            break;
+    }
+    
+    if (distance < collisionDistance) {
+        return true;
+    }
+}
+
+return false;
+}
+
+function checkPowerUpCollisions() {
+if (!ball) return;
+
+powerUps.forEach(powerUp => {
+    if (!powerUp.userData.collected && powerUp.position.distanceTo(ball.position) < 1.0) {
+        powerUp.userData.collected = true;
+        activatePowerUp(powerUp.userData.type);
+        
+        createAdvancedParticle('glow', powerUp.position, powerUp.userData.type.color);
+        ball.material.emissiveIntensity = 1.5;
+        setTimeout(() => {
+            ball.material.emissiveIntensity = 0.6;
+        }, 500);
+        
+        const start = performance.now();
+        const dur = 300;
+        const iv = setInterval(() => {
+            const t = (performance.now() - start) / dur;
+            if (t >= 1) {
+                scene.remove(powerUp);
+                clearInterval(iv);
+            } else {
+                powerUp.scale.setScalar(1 - t);
+                powerUp.rotation.y += 0.1;
+            }
+        }, 16);
+    }
+});
+}
+
+// نظام التخصيص المتقدم
+function showCustomization() {
+document.getElementById('particleQuality').value = playerCustomization.particleQuality;
+document.getElementById('lightingEffects').value = playerCustomization.lightingEffects;
+document.getElementById('postProcessing').checked = playerCustomization.postProcessing;
+document.getElementById('controlSensitivity').value = playerCustomization.controlSensitivity;
+document.getElementById('gravityEffect').value = playerCustomization.gravityEffect;
+document.getElementById('sensitivityValue').textContent = playerCustomization.controlSensitivity;
+document.getElementById('gravityValue').textContent = playerCustomization.gravityEffect;
+
+document.getElementById('customizationOverlay').style.display = 'flex';
+pushToBackStack(hideCustomization);
+}
+
+function hideCustomization() {
+playerCustomization.particleQuality = document.getElementById('particleQuality').value;
+playerCustomization.lightingEffects = document.getElementById('lightingEffects').value;
+playerCustomization.postProcessing = document.getElementById('postProcessing').checked;
+playerCustomization.controlSensitivity = parseFloat(document.getElementById('controlSensitivity').value);
+playerCustomization.gravityEffect = parseFloat(document.getElementById('gravityEffect').value);
+
+saveGameData();
+document.getElementById('customizationOverlay').style.display = 'none';
+}
+
+function updateControlSensitivity() {
+document.getElementById('sensitivityValue').textContent = document.getElementById('controlSensitivity').value;
+}
+
+function updateGravityEffect() {
+document.getElementById('gravityValue').textContent = document.getElementById('gravityEffect').value;
+}
+
+// نظام المتجر والسكنات
+function showStore() {
+const storeItemsEl = document.getElementById('storeItems');
+storeItemsEl.innerHTML = '';
+
+storeItems.forEach(item => {
+    const alreadyOwned = playerSkins.some(skin => skin.id === item.id);
+    const itemEl = document.createElement('div');
+    itemEl.className = 'skin-item';
+    itemEl.innerHTML = `
+        <h3>${item.name}</h3>
+        <div class="skin-preview" style="background:${item.previewColor}"></div>
+        <p>${item.description}</p>
+        <p>السعر: <span class="coin">${item.price} 🪙</span></p>
+        <button ${alreadyOwned ? 'disabled style="background:#333"' : coins < item.price ? 'disabled' : ''} onclick="buyItem('${item.id}')">
+            ${alreadyOwned ? 'مملوك' : coins >= item.price ? 'شراء' : 'نقاط غير كافية'}
+        </button>
+    `;
+    storeItemsEl.appendChild(itemEl);
+});
+
+document.getElementById('storeOverlay').style.display = 'flex';
+pushToBackStack(hideStore);
+}
+
+function hideStore() {
+document.getElementById('storeOverlay').style.display = 'none';
+}
+
+function showSkins() {
+const skinsListEl = document.getElementById('skinsList');
+skinsListEl.innerHTML = '';
+
+playerSkins.forEach(skin => {
+    const skinEl = document.createElement('div');
+    skinEl.className = `skin-item ${equippedSkin === skin.id ? 'equipped' : ''}`;
+    skinEl.innerHTML = `
+        <h3>${skin.name}</h3>
+        <div class="skin-preview" style="background:${skin.previewColor}"></div>
+        <p>${skin.description}</p>
+        <button onclick="equipSkin('${skin.id}')">
+            ${equippedSkin === skin.id ? 'مستخدم' : 'استخدام'}
+        </button>
+    `;
+    skinsListEl.appendChild(skinEl);
+});
+
+document.getElementById('skinsOverlay').style.display = 'flex';
+pushToBackStack(hideSkins);
+}
+
+function hideSkins() {
+document.getElementById('skinsOverlay').style.display = 'none';
+}
+
+function buyItem(itemId) {
+const item = storeItems.find(i => i.id === itemId);
+const alreadyOwned = playerSkins.some(skin => skin.id === itemId);
+
+if (alreadyOwned) {
+    alert('لقد اشتريت هذا السكن مسبقاً!');
+    return;
+}
+
+if (item && coins >= item.price) {
+    coins -= item.price;
+    coinsEl.textContent = coins;
+    
+    playerSkins.push({
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        previewColor: item.previewColor,
+        ballColor: item.ballColor,
+        ballEmissive: item.ballEmissive,
+        metalness: item.metalness,
+        roughness: item.roughness,
+        emissiveIntensity: item.emissiveIntensity
+    });
+    
+    saveGameData();
+    showStore();
+    if (ball) createAdvancedParticle('sparkle', ball.position, 0xffd700);
+}
+}
+
+async function equipSkin(skinId) {
+const skin = playerSkins.find(s => s.id === skinId);
+if (!skin) return;
+
+equippedSkin = skinId;
+
+if (!ball) {
+    saveGameData();
+    showSkins();
+    return;
+}
+
+await applyBallModel(ball, skin);
+
+saveGameData();
+showSkins();
+createAdvancedParticle('glow', ball.position, skin.ballColor || 0xffffff);
+}
+
+// نظام الألوان المحسن
+function showColorsMenu() {
+const colorPalette = document.getElementById('colorPalette');
+colorPalette.innerHTML = '';
+
+// إضافة الألوان المتاحة
+ballColors.available.forEach((color, index) => {
+    const colorOption = document.createElement('div');
+    colorOption.className = `color-option ${ballColors.current === color.value ? 'selected' : ''}`;
+    colorOption.style.background = color.value;
+    colorOption.title = color.name;
+    colorOption.onclick = () => selectBallColor(color.value, color.hex);
+    colorPalette.appendChild(colorOption);
+});
+
+// تعيين اللون المخصص الحالي
+document.getElementById('customColorPicker').value = ballColors.custom;
+
+// تحديث أزرار نمط اللون
+document.getElementById('solidColorBtn').classList.toggle('active', colorMode === 'solid');
+document.getElementById('gradientColorBtn').classList.toggle('active', colorMode === 'gradient');
+
+document.getElementById('colorsMenu').style.display = 'block';
+mainMenu.style.display = 'none';
+pushToBackStack(hideColorsMenu);
+}
+
+function hideColorsMenu() {
+document.getElementById('colorsMenu').style.display = 'none';
+mainMenu.style.display = 'block';
+}
+
+function selectBallColor(colorValue, colorHex) {
+ballColors.current = colorValue;
+ballColors.custom = colorValue;
+
+// تطبيق اللون على الكرة
+applyBallColor(colorHex);
+
+// تحديث الواجهة
+updateColorSelection();
+saveGameData();
+
+createAdvancedParticle('glow', ball ? ball.position : new THREE.Vector3(0, 2, 0), colorHex);
+}
+
+function applyCustomColor() {
+const customColor = document.getElementById('customColorPicker').value;
+const hexColor = parseInt(customColor.replace('#', ''), 16);
+
+ballColors.current = customColor;
+ballColors.custom = customColor;
+
+// تطبيق اللون على الكرة
+applyBallColor(hexColor);
+
+// تحديث الواجهة
+updateColorSelection();
+saveGameData();
+
+createAdvancedParticle('glow', ball ? ball.position : new THREE.Vector3(0, 2, 0), hexColor);
+}
+
+function resetBallColor() {
+selectBallColor('#ffffff', 0xffffff);
+}
+
+function updateColorSelection() {
+const colorOptions = document.querySelectorAll('.color-option');
+colorOptions.forEach(option => {
+    option.classList.remove('selected');
+    if (option.style.background === ballColors.current) {
+        option.classList.add('selected');
+    }
+});
+
+document.getElementById('customColorPicker').value = ballColors.custom;
+}
+
+// نظام التوقف
+function togglePause() {
+if (gamePaused) {
+    resumeGame();
+} else {
+    pauseGame();
+}
+}
+
+function pauseGame() {
+if (!gameActive || gamePaused) return;
+gamePaused = true;
+pauseOverlay.style.display = 'flex';
+pauseBtn.innerHTML = '⏵';
+pushToBackStack(resumeGame);
+}
+
+function resumeGame() {
+if (!gamePaused) return;
+gamePaused = false;
+pauseOverlay.style.display = 'none';
+pauseBtn.innerHTML = '⏸️';
+}
+
+function restartStage() {
+gamePaused = false;
+pauseOverlay.style.display = 'none';
+loadStage(currentStage);
+gameActive = true;
+pauseBtn.innerHTML = '⏸️';
+}
+
+function backToMainMenu() {
+gamePaused = false;
+gameActive = false;
+pauseOverlay.style.display = 'none';
+mainMenu.style.display = 'block';
+hideStagesMenu();
+pauseBtn.style.display = 'none';
+fullscreenBtn.style.display = 'none';
+setupBackButtonForMainMenu();
+}
+
+// نظام ملء الشاشة
+function toggleFullscreen() {
+if (!document.fullscreenElement) {
+    // الدخول إلى وضع ملء الشاشة
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+        document.documentElement.msRequestFullscreen();
+    }
+    fullscreenBtn.innerHTML = '⛶';
+} else {
+    // الخروج من وضع ملء الشاشة
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+    }
+    fullscreenBtn.innerHTML = '⛶';
+}
+}
+
+// تحديث زر ملء الشاشة عند تغيير الحالة
+document.addEventListener('fullscreenchange', updateFullscreenButton);
+document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+document.addEventListener('msfullscreenchange', updateFullscreenButton);
+
+function updateFullscreenButton() {
+if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+    fullscreenBtn.innerHTML = '⛶';
+} else {
+    fullscreenBtn.innerHTML = '⛶';
+}
+}
+
+pauseBtn.addEventListener('click', togglePause);
+fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+// نظام زر الرجوع في الهاتف
+let backButtonStack = [];
+
+function handleBackButton() {
+if (backButtonStack.length > 0) {
+    const lastAction = backButtonStack.pop();
+    lastAction();
+} else {
+    if (confirm('هل تريد الخروج من اللعبة؟')) {
+        window.close();
+    }
+}
+}
+
+function pushToBackStack(action) {
+backButtonStack.push(action);
+}
+
+function clearBackStack() {
+backButtonStack = [];
+}
+
+window.addEventListener('popstate', function(event) {
+handleBackButton();
+});
+
+document.addEventListener('keydown', function(e) {
+if (e.key === 'Escape') {
+    handleBackButton();
+    e.preventDefault();
+}
+});
+
+// دوال جديدة للمراحل
+function showStagesMenu() {
+const stageButtons = document.getElementById('stageButtons');
+stageButtons.innerHTML = '';
+
+console.log(`📊 عدد المراحل المتاحة: ${stagesData.length}`);
+console.log(`🔓 المراحل المفتوحة: ${unlockedStages}`);
+
+if (stagesData.length === 0) {
+    stageButtons.innerHTML = '<p style="color:red;">❌ لم يتم تحميل أي مرحلة</p>';
+    return;
+}
+
+stagesData.forEach((stage, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'stage-btn';
+    btn.textContent = stage.name || `المرحلة ${index + 1}`;
+    btn.disabled = !unlockedStages.includes(index);
+    btn.onclick = () => {
+        loadStage(index);
+        hideStagesMenu();
+        mainMenu.style.display = 'none';
+        gameActive = true;
+        pauseBtn.style.display = 'flex';
+        fullscreenBtn.style.display = 'flex';
+        clearBackStack();
+        pushToBackStack(pauseGame);
+    };
+    stageButtons.appendChild(btn);
+});
+
+document.getElementById('stagesMenu').style.display = 'block';
+mainMenu.style.display = 'none';
+pushToBackStack(hideStagesMenu);
+}
+
+function hideStagesMenu() {
+document.getElementById('stagesMenu').style.display = 'none';
+mainMenu.style.display = 'block';
+}
+
+function resetGameData() {
+if (confirm('⚠️ هل أنت متأكد من إعادة تعيين اللعبة؟ سيتم حذف كل التقدم والمشتريات!')) {
+    coins = 100;
+    unlockedStages = [0];
+    playerSkins = [{
+        id: 'default',
+        name: 'افتراضي',
+        description: 'سكن أساسي بلون أبيض متوهج',
+        previewColor: '#ffffff',
+        ballColor: 16777215,
+        ballEmissive: 8947967,
+        metalness: 0.7,
+        roughness: 0.12,
+        emissiveIntensity: 0.6
+    }];
+    equippedSkin = 'default';
+    ballColors.current = '#ffffff';
+    ballColors.custom = '#ffffff';
+    colorMode = 'solid';
+    playerCustomization = {
+        particleQuality: 'medium',
+        lightingEffects: 'basic',
+        postProcessing: false,
+        controlSensitivity: 1.0,
+        gravityEffect: 1.0
+    };
+    
+    coinsEl.textContent = coins;
+    scoreEl.textContent = '0';
+    
+    localStorage.removeItem('crystalMazeSave');
+    
+    hideCustomization();
+    mainMenu.style.display = 'block';
+    
+    alert('✅ تم إعادة تعيين اللعبة بنجاح!');
+}
+}
+
+function saveGameData() {
+const gameData = {
+    coins: coins,
+    skins: playerSkins,
+    equipped: equippedSkin,
+    unlockedStages: unlockedStages,
+    customization: playerCustomization,
+    currentStage: currentStage,
+    playerScore: score,
+    ballColors: ballColors,
+    colorMode: colorMode
+};
+localStorage.setItem('crystalMazeSave', JSON.stringify(gameData));
+}
+
+function loadSaveData() {
+const saved = localStorage.getItem('crystalMazeSave');
+if (saved) {
+    try {
+        const data = JSON.parse(saved);
+        coins = data.coins || coins;
+        playerSkins = data.skins || playerSkins;
+        equippedSkin = data.equipped || equippedSkin;
+        unlockedStages = data.unlockedStages || unlockedStages;
+        playerCustomization = data.customization || playerCustomization;
+        currentStage = data.currentStage || currentStage;
+        score = data.playerScore || score;
+        ballColors = data.ballColors || ballColors;
+        colorMode = data.colorMode || 'solid';
+        
+        coinsEl.textContent = coins;
+        scoreEl.textContent = score;
+    } catch (error) {
+        console.error('خطأ في تحميل البيانات المحفوظة:', error);
+    }
+}
+}
+
+function showMessage(title, text, buttons) {
+msgTitle.textContent = title;
+msgText.textContent = text;
+msgButtons.innerHTML = '';
+buttons.forEach(btn => {
+    const button = document.createElement('button');
+    button.textContent = btn.text;
+    button.onclick = () => { btn.action(); };
+    msgButtons.appendChild(button);
+});
+msgOverlay.style.display = 'flex';
+}
+
+function hideMessage() { 
+msgOverlay.style.display = 'none'; 
+}
+
+// دالة إكمال المرحلة مع نظام العملات المحسن
+function completeStage() {
+gameActive = false;
+gamePaused = false;
+
+// نظام المكافآت حسب المرحلة
+const stageRewards = [50, 75, 100, 150, 200];
+let baseReward = stageRewards[currentStage] || 100;
+
+// العملات من الشظايا (كل 5 شظايا = 1 عملة)
+const coinsFromShards = Math.floor(score / 5);
+
+// المكافأة الكلية
+const totalCoinsEarned = baseReward + coinsFromShards;
+
+coins += totalCoinsEarned;
+coinsEl.textContent = coins;
+
+// فتح المرحلة التالية
+if (!unlockedStages.includes(currentStage + 1) && stagesData[currentStage + 1]) {
+    unlockedStages.push(currentStage + 1);
+}
+
+saveGameData();
+
+const nextAvailable = stagesData[currentStage + 1] && unlockedStages.includes(currentStage + 1);
+const buttons = [
+    {
+        text: 'إعادة اللعب',
+        action: () => {
+            hideMessage();
+            loadStage(currentStage);
+            gameActive = true;
+        }
+    },
+    {
+        text: 'القائمة الرئيسية',
+        action: () => {
+            hideMessage();
+            mainMenu.style.display = 'block';
+            hideStagesMenu();
+            pauseBtn.style.display = 'none';
+            fullscreenBtn.style.display = 'none';
+            setupBackButtonForMainMenu();
+        }
+    }
+];
+
+if (nextAvailable) {
+    buttons.unshift({
+        text: 'المرحلة التالية',
+        action: () => {
+            hideMessage();
+            loadStage(currentStage + 1);
+            gameActive = true;
+        }
+    });
+}
+
+showMessage('مبروك! 🎉', 
+    `لقد أتممت المرحلة ${currentStage + 1} بنجاح!\n\n` +
+    `ربحت ${totalCoinsEarned} عملة!\n` +
+    `(${baseReward} مكافأة المرحلة + ${coinsFromShards} من الشظايا)`, 
+    buttons);
+}
+
+function loadStage(index) {
+currentStage = index;
+initStage(stagesData[index]);
+}
+
+async function initStage(data) {
+// تنظيف المشهد
+tiles.forEach(t => scene.remove(t)); tiles = [];
+traps.forEach(t => scene.remove(t)); traps = [];
+crystals.forEach(c => scene.remove(c)); crystals = [];
+powerUps.forEach(p => scene.remove(p)); powerUps = [];
+dynamicObstacles.forEach(o => scene.remove(o)); dynamicObstacles = [];
+activeParticles.forEach(p => scene.remove(p.mesh)); activeParticles = [];
+advancedParticles.forEach(p => scene.remove(p.mesh)); advancedParticles = [];
+activePowerUps = [];
+
+if (currentBallModel) { 
+    scene.remove(currentBallModel); 
+    currentBallModel = null; 
+}
+if (ball) { 
+    if (ball.userData.effects) {
+        ball.userData.effects.forEach(effect => {
+            if (effect.light) scene.remove(effect.light);
+            if (effect.particles) clearInterval(effect.particles);
+            if (effect.specialEffect) clearInterval(effect.specialEffect);
+        });
+    }
+    cleanupSkinEffects(ball);
+    scene.remove(ball); 
+    ball = null; 
+}
+
+CELL = data.CELL || 2; 
+COLS = data.COLS || 7; 
+ROWS = data.ROWS || 20;
+score = 0; 
+scoreEl.textContent = score;
+
+// الأرضية
+const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(COLS * CELL, ROWS * CELL),
+    new THREE.MeshStandardMaterial({color: 0x061226, metalness: 0.05, roughness: 0.85})
+);
+ground.rotation.x = -Math.PI / 2; 
+ground.receiveShadow = true; 
+scene.add(ground);
+
+// البلاطات
+if (data.tiles && data.tiles.length > 0) {
+    data.tiles.forEach(tdata => {
+        const tileType = TILE_TYPES[tdata.type?.toUpperCase()] || TILE_TYPES.NORMAL;
+        const material = new THREE.MeshStandardMaterial({
+            color: tileType.color,
+            emissive: tileType.emissive,
+            metalness: 0.1,
+            roughness: 0.7
+        });
+        
+        const t = new THREE.Mesh(new THREE.BoxGeometry(CELL * 0.98, 0.2, CELL * 0.98), material);
+        t.position.set(tdata.x, tdata.height || 0.1, tdata.z);
+        
+        if (tdata.slope) {
+            if (tdata.slope.axis === 'x') t.rotation.x = tdata.slope.angle;
+            else if (tdata.slope.axis === 'z') t.rotation.z = tdata.slope.angle;
+        }
+        
+        if (tdata.direction) {
+            t.rotation.y = tdata.direction === 'left' ? Math.PI / 2 : -Math.PI / 2;
+        }
+        
+        t.receiveShadow = true;
+        t.castShadow = true;
+        t.userData = {
+            type: tdata.type || "normal",
+            height: tdata.height || 0.1,
+            width: CELL * 0.98,
+            depth: CELL * 0.98,
+            slope: tdata.slope || null,
+            direction: tdata.direction || null,
+            friction: tileType.friction,
+            bounce: tileType.bounce || 0
+        };
+        scene.add(t); 
+        tiles.push(t);
+    });
+}
+
+// الفخاخ
+(data.traps || []).forEach(tr => {
+    const t = new THREE.Mesh(
+        new THREE.BoxGeometry(CELL * 0.9, 0.2, 0.12),
+        new THREE.MeshStandardMaterial({emissive: 0xff4466, emissiveIntensity: 0.0, color: 0x222222})
+    );
+    t.position.set(tr.x, tr.height || 0.8, tr.z);
+    t.userData = {period: tr.period || 3000, phase: tr.phase || 0, active: false};
+    scene.add(t); 
+    traps.push(t);
+});
+
+// الكريستالات
+const crystalGeo = new THREE.OctahedronGeometry(0.35);
+const crystalMat = new THREE.MeshStandardMaterial({color: 0x99eeff, emissive: 0x99eeff, metalness: 0.5, roughness: 0.2});
+(data.crystals || []).forEach(cr => {
+    const c = new THREE.Mesh(crystalGeo, crystalMat.clone());
+    c.position.set(cr.x, cr.height || 1.5, cr.z);
+    c.userData = {collected: false};
+    scene.add(c); 
+    crystals.push(c);
+});
+
+// القدرات الخاصة
+(data.powerUps || []).forEach(pu => {
+    const powerUpType = POWERUP_TYPES[pu.type?.toUpperCase()];
+    if (!powerUpType) return;
+    
+    const geometry = new THREE.OctahedronGeometry(0.4);
+    const material = new THREE.MeshStandardMaterial({
+        color: powerUpType.color,
+        emissive: powerUpType.color,
+        emissiveIntensity: 0.8,
+        metalness: 0.6,
+        roughness: 0.3
+    });
+    
+    const p = new THREE.Mesh(geometry, material);
+    p.position.set(pu.x, pu.height || 1.2, pu.z);
+    p.userData = {
+        type: powerUpType,
+        collected: false
+    };
+    
+    scene.add(p);
+    powerUps.push(p);
+});
+
+// العقبات الديناميكية
+(data.dynamicObstacles || []).forEach(obs => {
+    createDynamicObstacle(obs);
+});
+
+// الكرة مع السكن المختار واللون المختار
+const currentSkin = playerSkins.find(s => s.id === equippedSkin) || {};
+
+// استخدام اللون المختار بدلاً من لون السكن
+const selectedColor = parseInt(ballColors.current.replace('#', ''), 16);
+
+const ballGeometry = new THREE.SphereGeometry(0.6, 32, 20);
+let basicMaterial;
+
+if (colorMode === 'solid') {
+    basicMaterial = new THREE.MeshBasicMaterial({
+        color: selectedColor,
+        transparent: false
+    });
+} else {
+    basicMaterial = new THREE.MeshStandardMaterial({
+        color: selectedColor,
+        emissive: selectedColor,
+        emissiveIntensity: 0.1,
+        metalness: 0.1,
+        roughness: 0.8,
+        transparent: false
+    });
+}
+
+ball = new THREE.Mesh(ballGeometry, basicMaterial);
+ball.castShadow = true; 
+ball.userData = {
+    velocity: new THREE.Vector3(0, 0, 0),
+    onGround: false,
+    groundY: 0.9,
+    radius: 0.6,
+    onSlopedSurface: false,
+    slopeNormal: new THREE.Vector3(0, 1, 0),
+    shielded: false,
+    magnet: false,
+    magnetStrength: 0,
+    speedBoost: 1.0,
+    effects: []
+};
+
+// تطبيق النموذج مع اللون المختار
+await applyBallModel(ball, {...currentSkin, ballColor: selectedColor});
+
+resetBall(); 
+scene.add(ball);
+
+stageLabel.textContent = data.name || ("المرحلة " + (currentStage + 1));
+hint.style.display = 'block';
+updatePowerUpIndicator();
+clearBackStack();
+pushToBackStack(pauseGame);
+}
+
+function resetBall() {
+if (!ball) return; 
+ball.position.set(0, 2.0, 0);
+if (ball.userData.velocity) ball.userData.velocity.set(0, 0, 0);
+ball.userData.onGround = true;
+ball.userData.groundY = 2.0;
+ball.userData.shielded = false;
+ball.userData.magnet = false;
+ball.userData.speedBoost = 1.0;
+activePowerUps = [];
+updatePowerUpIndicator();
+
+if (currentBallModel) {
+    currentBallModel.position.copy(ball.position);
+}
+}
+
+function applyImpulse(dx, dy, dt = 0.016) {
+if (!ball || !ball.userData.onGround) return;
+
+const factor = 0.04 * playerCustomization.controlSensitivity;
+const cameraDir = new THREE.Vector3(); 
+camera.getWorldDirection(cameraDir); 
+cameraDir.y = 0; 
+cameraDir.normalize();
+
+const right = new THREE.Vector3().crossVectors(cameraDir, new THREE.Vector3(0, 1, 0));
+const impulse = new THREE.Vector3();
+
+impulse.addScaledVector(cameraDir, -dy * factor / dt);
+impulse.addScaledVector(right, dx * factor / dt);
+impulse.normalize().multiplyScalar(IMPULSE * Math.min(1, Math.hypot(dx, dy) / 200));
+
+ball.userData.velocity.add(impulse);
+if (ball.userData.velocity.length() > MAX_SPEED) ball.userData.velocity.setLength(MAX_SPEED);
+}
+
+canvas.addEventListener('pointerdown', e => {
+if (!gameActive || !ball || gamePaused) return; 
+pointerDown = true; 
+startPos = {x: e.clientX, y: e.clientY}; 
+moving = false; 
+hint.style.display = 'none';
+});
+
+canvas.addEventListener('pointermove', e => {
+if (!gameActive || !pointerDown || !startPos || !ball || gamePaused) return; 
+const dx = e.clientX - startPos.x;
+const dy = e.clientY - startPos.y;
+const dist = Math.hypot(dx, dy); 
+if (dist > MIN_MOVE) moving = true; 
+if (moving) applyImpulse(dx, dy, 0.016); 
+startPos = {x: e.clientX, y: e.clientY};
+});
+
+canvas.addEventListener('pointerup', e => {
+pointerDown = false; 
+startPos = null; 
+moving = false;
+});
+
+// دالة إنشاء العقبات الديناميكية
+function createDynamicObstacle(obsData) {
+let geometry, material, obstacle;
+
+switch (obsData.type) {
+    case 'moving_platform':
+        geometry = new THREE.BoxGeometry(obsData.width || 2, 0.2, obsData.depth || 2);
+        material = new THREE.MeshStandardMaterial({
+            color: 0x44aa88,
+            emissive: 0x226644
+        });
+        obstacle = new THREE.Mesh(geometry, material);
+        obstacle.position.set(obsData.x, obsData.height || 0.5, obsData.z);
+        obstacle.userData = {
+            type: 'moving_platform',
+            platform: true,
+            width: obsData.width || 2,
+            depth: obsData.depth || 2,
+            height: 0.2,
+            startPos: new THREE.Vector3(obsData.startX || obsData.x, obsData.height || 0.5, obsData.startZ || obsData.z),
+            endPos: new THREE.Vector3(obsData.endX || obsData.x, obsData.height || 0.5, obsData.endZ || obsData.z),
+            speed: obsData.speed || 1,
+            direction: 1
+        };
+        break;
+        
+    case 'rotating_blade':
+        geometry = new THREE.CylinderGeometry(0.1, 0.1, 0.8, 8);
+        material = new THREE.MeshStandardMaterial({
+            color: 0xff4444,
+            emissive: 0xaa2222
+        });
+        obstacle = new THREE.Mesh(geometry, material);
+        obstacle.position.set(obsData.x, obsData.height || 1.5, obsData.z);
+        obstacle.userData = {
+            type: 'rotating_blade',
+            platform: false,
+            rotationSpeed: obsData.rotationSpeed || 3
+        };
+        break;
+        
+    case 'falling_platform':
+        geometry = new THREE.BoxGeometry(obsData.width || 2, 0.2, obsData.depth || 2);
+        material = new THREE.MeshStandardMaterial({
+            color: 0xffaa44,
+            emissive: 0xaa6622
+        });
+        obstacle = new THREE.Mesh(geometry, material);
+        obstacle.position.set(obsData.x, obsData.height || 0.5, obsData.z);
+        obstacle.userData = {
+            type: 'falling_platform',
+            platform: true,
+            width: obsData.width || 2,
+            depth: obsData.depth || 2,
+            height: 0.2,
+            falling: false,
+            fallTimer: 0,
+            fallDelay: obsData.fallDelay || 1,
+            fallSpeed: obsData.fallSpeed || 5,
+            originalY: obsData.height || 0.5
+        };
+        break;
+}
+
+if (obstacle) {
+    obstacle.castShadow = true;
+    obstacle.receiveShadow = true;
+    scene.add(obstacle);
+    dynamicObstacles.push(obstacle);
+}
+}
+
+let last = performance.now();
+function animate() {
+const now = performance.now(); 
+const dt = Math.min(0.05, (now - last) / 1000); 
+last = now;
+
+if (gameActive && ball && !gamePaused) {
+    applyPhysics(dt);
+    updatePowerUps(dt);
+    updateDynamicObstacles(dt);
+    updateSkinEffects(dt);
+    checkPowerUpCollisions();
+    
+    if (checkHazardCollisions()) {
+        resetBall();
+        createAdvancedParticle('explosion', ball.position, 0xff4444);
+    }
+
+    traps.forEach(t => {
+        const active = Math.sin((now + t.userData.phase * 500) / t.userData.period * Math.PI * 2) > 0.3;
+        t.userData.active = active;
+        t.material.emissiveIntensity = active ? 1.2 : 0.0;
+        t.material.color.setHex(active ? 0xff4466 : 0x222222);
+    });
+
+    ball.position.x += ball.userData.velocity.x * dt;
+    ball.position.z += ball.userData.velocity.z * dt;
+    
+    // تحديث النموذج 3D إذا كان موجوداً
+    if (currentBallModel) {
+        currentBallModel.position.copy(ball.position);
+        currentBallModel.rotation.x += ball.userData.velocity.z * dt * 0.5;
+        currentBallModel.rotation.z += ball.userData.velocity.x * dt * 0.5;
+    }
+
+    const vel2d = new THREE.Vector3(ball.userData.velocity.x, 0, ball.userData.velocity.z);
+    if (vel2d.length() > 0.0001 && !currentBallModel) {
+        const axis = new THREE.Vector3(vel2d.z, 0, -vel2d.x).normalize(); 
+        ball.rotateOnAxis(axis, vel2d.length() * dt * 1.5);
+    }
+
+    const halfW = ((COLS - 1) / 2) * CELL - 0.6; 
+    ball.position.x = Math.max(-halfW, Math.min(halfW, ball.position.x));
+
+    if (ball.userData.onGround && !ball.userData.shielded) {
+        traps.forEach(t => {
+            if (!t.userData.active) return; 
+            const dist = new THREE.Vector2(ball.position.x - t.position.x, ball.position.z - t.position.z).length(); 
+            if (dist < CELL * 0.8) resetBall();
+        });
+    }
+
+    let allCollected = true;
+    crystals.forEach(c => {
+        if (c.userData.collected) return;
+        allCollected = false;
+        if (c.position.distanceTo(ball.position) < 1.0) {
+            c.userData.collected = true; 
+            score++; 
+            scoreEl.textContent = score;
+            
+            // إضافة عملة لكل 5 شظايا
+            if (score % 5 === 0) {
+                coins++;
+                coinsEl.textContent = coins;
+                createAdvancedParticle('coin', ball.position, 0xffd700);
+            }
+            
+            ball.material.emissiveIntensity = 2.2; 
+            ballLight.intensity = 2.4;
+            setTimeout(() => {
+                ball.material.emissiveIntensity = 0.6; 
+                ballLight.intensity = 0.9;
+            }, 300);
+            
+            const start = performance.now();
+            const dur = 300;
+            const iv = setInterval(() => {
+                const t = (performance.now() - start) / dur;
+                if (t >= 1) {
+                    scene.remove(c);
+                    clearInterval(iv);
+                } else {
+                    c.scale.setScalar(1 - t);
+                }
+            }, 16);
+        }
+    });
+
+    if (allCollected && crystals.length > 0) {
+        completeStage();
+    }
+}
+
+updateParticles(dt);
+
+if (ball) {
+    const vel2d = ball.userData.velocity ? new THREE.Vector3(ball.userData.velocity.x, 0, ball.userData.velocity.z) : new THREE.Vector3(0, 0, 0);
+    const idealCam = new THREE.Vector3(
+        ball.position.x,
+        6 + Math.min(4, vel2d.length() * 0.2),
+        ball.position.z + 14
+    );
+    camera.position.lerp(idealCam, 0.12);
+    camera.lookAt(ball.position.x, ball.position.y, ball.position.z - 2);
+    ballLight.position.lerp(new THREE.Vector3(ball.position.x, ball.position.y + 1.2, ball.position.z), 0.2);
+}
+
+renderer.setSize(window.innerWidth, window.innerHeight, false);
+renderer.render(scene, camera);
+requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', () => {
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth, window.innerHeight, false);
+});
+
+// إضافة مستمعين لأحداث التخصيص
+document.getElementById('controlSensitivity').addEventListener('input', updateControlSensitivity);
+document.getElementById('gravityEffect').addEventListener('input', updateGravityEffect);
+
+// إعداد نظام الرجوع للقائمة الرئيسية
+function setupBackButtonForMainMenu() {
+clearBackStack();
+pushToBackStack(() => {
+    if (confirm('هل تريد الخروج من اللعبة؟')) {
+        window.close();
+    }
+});
+}
+
+// تحميل البيانات المحفوظة وبدء اللعبة
+loadSaveData();
+mainMenu.style.display = 'block';
+setupBackButtonForMainMenu();
+
+// تحميل النماذج ثلاثية الأبعاد
+await load3DModels();
+
+// تحميل بيانات المراحل
+const stagesData = await loadGameData();
+
+// بدء اللعبة
+requestAnimationFrame(animate);
+
+// جعل الدوال متاحة عالمياً
+window.showStore = showStore;
+window.hideStore = hideStore;
+window.showSkins = showSkins;
+window.hideSkins = hideSkins;
+window.buyItem = buyItem;
+window.equipSkin = equipSkin;
+window.showCustomization = showCustomization;
+window.hideCustomization = hideCustomization;
+window.updateControlSensitivity = updateControlSensitivity;
+window.updateGravityEffect = updateGravityEffect;
+window.togglePause = togglePause;
+window.resumeGame = resumeGame;
+window.restartStage = restartStage;
+window.backToMainMenu = backToMainMenu;
+window.showStagesMenu = showStagesMenu;
+window.hideStagesMenu = hideStagesMenu;
+window.resetGameData = resetGameData;
+
+// دوال نظام الألوان الجديد
+window.showColorsMenu = showColorsMenu;
+window.hideColorsMenu = hideColorsMenu;
+window.selectBallColor = selectBallColor;
+window.applyCustomColor = applyCustomColor;
+window.resetBallColor = resetBallColor;
+window.setColorMode = setColorMode;
+
+// دالة ملء الشاشة
+window.toggleFullscreen = toggleFullscreen;
+
+// تهيئة عناصر المتجر
+storeItems = [
+    {
+        id: 'fire_ball',
+        name: 'كرة النار',
+        description: 'كرة نارية متوهجة بتأثيرات نارية رائعة',
+        previewColor: '#ff4400',
+        price: 200,
+        ballColor: 0xff4400,
+        ballEmissive: 0xff3300,
+        metalness: 0.8,
+        roughness: 0.2,
+        emissiveIntensity: 0.8
+    },
+    {
+        id: 'ice_core',
+        name: 'نواة الجليد',
+        description: 'كرة جليدية متبلورة بتأثيرات ثلجية',
+        previewColor: '#a3e6ff',
+        price: 180,
+        ballColor: 0xa3e6ff,
+        ballEmissive: 0x88ccff,
+        metalness: 0.9,
+        roughness: 0.1,
+        emissiveIntensity: 0.7
+    },
+    {
+        id: 'spike_ball',
+        name: 'كرة الشوك',
+        description: 'كرة شوكية حادة بتأثيرات طاقوية خضراء',
+        previewColor: '#00ff00',
+        price: 250,
+        ballColor: 0x00ff00,
+        ballEmissive: 0x00cc00,
+        metalness: 0.7,
+        roughness: 0.3,
+        emissiveIntensity: 0.6
+    }
+];
+
+// تعيين السكن الافتراضي
+equippedSkin = 'default';
+
+// إعداد السكنات الافتراضية إذا لم تكن موجودة
+if (!playerSkins.some(skin => skin.id === 'default')) {
+    playerSkins.push({
+        id: 'default',
+        name: 'افتراضي',
+        description: 'سكن أساسي بلون أبيض متوهج',
+        previewColor: '#ffffff',
+        ballColor: 16777215,
+        ballEmissive: 8947967,
+        metalness: 0.7,
+        roughness: 0.12,
+        emissiveIntensity: 0.6
+    });
+    equippedSkin = 'default';
+}
+
+// حفظ البيانات بعد التهيئة
+saveGameData();
+
+console.log("🎮 Crystal Maze: Ultimate Edition - جاهز للعب!");
+console.log(`📊 عدد المراحل: ${stagesData.length}`);
+console.log(`🎨 عدد السكنات: ${playerSkins.length}`);
+console.log(`💰 النقاط: ${coins}`);
+})();
+</script>
+</body>
+</html>
